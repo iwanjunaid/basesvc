@@ -1,0 +1,3 @@
+development:
+  driver: mysql
+  open: root:123456@tcp(127.0.0.1:3307)/basesvc
