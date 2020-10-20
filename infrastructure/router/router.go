@@ -1,16 +1,19 @@
 package router
 
 import (
-	"github.com/iwanjunaid/basesvc/interface/controller"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/iwanjunaid/basesvc/adapter/controller"
 )
 
-func NewRouter(e *echo.Echo, c controller.AppController) *echo.Echo {
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+// NewRouter create new router
+func NewRouter(app *fiber.App, c controller.AppController) {
+	app.Use(cors.New())
+	app.Use(logger.New())
+	// app.Use(middleware.Recover()) // ?
 
-	e.GET("/users", func(context echo.Context) error { return c.User.GetUsers(context) })
-
-	return e
+	app.Get("/authors", func(ctx *fiber.Ctx) error {
+		return c.Author.GetAuthors(ctx)
+	})
 }

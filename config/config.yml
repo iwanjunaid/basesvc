@@ -2,7 +2,8 @@ database:
   user: root
   password: 123456
   net: tcp
-  addr: 127.0.0.1:3306
+  host: 127.0.0.1
+  port: 3306
   dbname: basesvc
   allowNativePasswords: true
   params:
