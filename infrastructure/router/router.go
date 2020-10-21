@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/iwanjunaid/basesvc/config"
+	"github.com/mataharimall/notifications/src/http/middleware"
 
 	"github.com/iwanjunaid/basesvc/registry"
 
@@ -43,7 +44,7 @@ func (r *Rest) InitRouter() *fiber.App {
 
 	app.Use(cors.New())
 	app.Use(logger.New())
-	// app.Use(middleware.Recover()) // ?
+	app.Use(middleware.Recover())
 
 	registry := registry.NewRegistry(r.db)
 
