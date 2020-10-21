@@ -48,8 +48,18 @@ func (r *Rest) InitRouter() *fiber.App {
 	registry := registry.NewRegistry(r.db)
 
 	c := registry.NewAppController()
-
-	app.Get("/authors", func(ctx *fiber.Ctx) error {
+	v1 := app.Group("/v1")
+	author := v1.Group("/author")
+	author.Get("/", func(ctx *fiber.Ctx) error {
+		return c.Author.GetAuthors(ctx)
+	})
+	app.Get("/:id", func(ctx *fiber.Ctx) error {
+		return c.Author.GetAuthors(ctx)
+	})
+	app.Post("/", func(ctx *fiber.Ctx) error {
+		return c.Author.GetAuthors(ctx)
+	})
+	app.Put("/:id", func(ctx *fiber.Ctx) error {
 		return c.Author.GetAuthors(ctx)
 	})
 
