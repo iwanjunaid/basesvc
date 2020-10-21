@@ -1,24 +1,25 @@
 package registry
 
 import (
-	"github.com/iwanjunaid/basesvc/interface/controller"
-	"github.com/jinzhu/gorm"
+	"database/sql"
+
+	"github.com/iwanjunaid/basesvc/adapter/controller"
 )
 
 type registry struct {
-	db *gorm.DB
+	db *sql.DB
 }
 
 type Registry interface {
 	NewAppController() controller.AppController
 }
 
-func NewRegistry(db *gorm.DB) Registry {
+func NewRegistry(db *sql.DB) Registry {
 	return &registry{db}
 }
 
 func (r *registry) NewAppController() controller.AppController {
 	return controller.AppController{
-		User: r.NewUserController(),
+		Author: r.NewAuthorController(),
 	}
 }
