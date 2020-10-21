@@ -4,8 +4,11 @@ import (
 	"database/sql"
 	"log"
 
+	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/iwanjunaid/basesvc/config"
-	"github.com/mataharimall/notifications/src/http/middleware"
+	_ "github.com/iwanjunaid/basesvc/docs"
+
+	// "github.com/mataharimall/notifications/src/http/middleware"
 
 	"github.com/iwanjunaid/basesvc/registry"
 
@@ -39,12 +42,28 @@ func (r *Rest) setup() {
 	r.router = r.InitRouter()
 }
 
+// @title BaseSVC API
+// @version 1.0
+// @description This is a sample basesvc server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /v1
 func (r *Rest) InitRouter() *fiber.App {
 	app := fiber.New()
 
 	app.Use(cors.New())
 	app.Use(logger.New())
-	app.Use(middleware.Recover())
+	// app.Use(middleware.Recover())
+
+	app.Use("/swagger", swagger.Handler)
 
 	registry := registry.NewRegistry(r.db)
 
