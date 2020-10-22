@@ -9,6 +9,9 @@
 !.vscode/extensions.json
 *.code-workspace
 
+### Goland ###
+.idea
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe
@@ -16,6 +19,7 @@
 *.dll
 *.so
 *.dylib
+**/*.go
 
 # Test binary, built with `go test -c`
 *.test
