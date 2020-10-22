@@ -26,8 +26,7 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 
 	fmt.Println(author.db)
 
-	// rows, err := author.db.QueryContext(newContext, query)
-	rows, err := author.db.Query(query)
+	rows, err := author.db.QueryContext(ctx, query)
 
 	if err != nil {
 		return nil, err
