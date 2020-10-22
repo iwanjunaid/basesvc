@@ -9,6 +9,7 @@ dependencies:
 	@echo "> Installing the server dependencies ..."
 	@go mod tidy -v
 	@go install github.com/swaggo/swag/cmd/swag
+	@go get -u github.com/cosmtrek/air
 
 unittest:
 	go test -short  ./...
