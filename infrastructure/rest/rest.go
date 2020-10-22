@@ -24,7 +24,7 @@ type RestImpl struct {
 
 // @title BaseSVC API
 // @version 1.0
-// @description This is a sample basesvc server api 123.
+// @description This is a sample basesvc server api.
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
