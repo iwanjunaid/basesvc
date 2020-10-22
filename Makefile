@@ -26,4 +26,12 @@ lint:
 docs:
 	swag init -g infrastructure/router/router.go
 
+docker:
+	@echo "> Build Docker image"
+	@docker build -t basesvc build/. 
+
+run:
+	@echo "> Run docker-compose"
+	@docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.mysql.yml up --build -d
+
 .PHONY: clean install unittest lint-prepare lint docs engine test dependencies
