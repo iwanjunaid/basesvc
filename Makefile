@@ -33,7 +33,7 @@ docs:
 
 docker:
 	@echo "> Build Docker image"
-	@docker build -t basesvc build/. 
+	@docker build -t basesvc -f build/Dockerfile . 
 
 run:
 	@echo "> Run docker-compose"
