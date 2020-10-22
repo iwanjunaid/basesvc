@@ -1,6 +1,7 @@
 version: "3"
 services:
   api:
+    image: basesvc
     build:
       context: ../.
       dockerfile: ./build/Dockerfile
