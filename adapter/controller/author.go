@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -29,6 +30,7 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 		return err
 	}
 
+	fmt.Println("Ok")
 	if authors != nil {
 		c.Response().SetStatusCode(http.StatusNotFound)
 	}

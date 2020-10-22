@@ -23,7 +23,11 @@ func NewAuthorRepository(db *sql.DB) repository.AuthorRepository {
 
 func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
 	query := fmt.Sprintf("SELECT id, name, email FROM %s", authorsTable)
-	rows, err := author.db.QueryContext(ctx, query)
+
+	fmt.Println(author.db)
+
+	// rows, err := author.db.QueryContext(newContext, query)
+	rows, err := author.db.Query(query)
 
 	if err != nil {
 		return nil, err

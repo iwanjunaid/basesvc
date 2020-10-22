@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/spf13/viper"
 )
 
@@ -47,6 +45,4 @@ func ReadConfig() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	spew.Dump(C)
 }
