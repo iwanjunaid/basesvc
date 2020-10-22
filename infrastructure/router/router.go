@@ -8,13 +8,13 @@ import (
 	"github.com/iwanjunaid/basesvc/config"
 	_ "github.com/iwanjunaid/basesvc/docs"
 
-	// "github.com/mataharimall/notifications/src/http/middleware"
-
 	"github.com/iwanjunaid/basesvc/registry"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 type Rest struct {
@@ -61,10 +61,10 @@ func (r *Rest) InitRouter() *fiber.App {
 
 	app.Use(cors.New())
 	app.Use(logger.New())
-	// app.Use(middleware.Recover())
 
 	app.Use("/swagger", swagger.Handler)
-
+	app.Use(recover.New())
+  
 	registry := registry.NewRegistry(r.db)
 
 	c := registry.NewAppController()
