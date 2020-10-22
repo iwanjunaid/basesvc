@@ -2,25 +2,18 @@
 FROM golang:1.15.3-alpine3.12 as builder
 
 RUN apk update && apk upgrade && \
-    apk --update add git make
+    apk --update add git make curl
 
 WORKDIR /app
 
 COPY . .
+COPY config/.air.toml .air.toml
 
-RUN make engine
+RUN make dependencies
 
-# Distribution
-FROM alpine:latest
+RUN curl -fLo install.sh https://raw.githubusercontent.com/cosmtrek/air/master/install.sh \
+    && chmod +x install.sh && sh install.sh && ./bin/air /bin/air
 
-RUN apk update && apk upgrade && \
-    apk --update --no-cache add tzdata && \
-    mkdir /app 
+EXPOSE 9090
 
-WORKDIR /app 
-
-EXPOSE 8080
-
-COPY --from=builder /app/basesvc /app
-
-CMD /app/basesvc
+CMD ["air", "-c", ".air.toml"]
