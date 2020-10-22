@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/iwanjunaid/basesvc/adapter/controller"
+
 	"github.com/iwanjunaid/basesvc/config"
 
 	"github.com/iwanjunaid/basesvc/registry"
@@ -52,18 +54,22 @@ func (r *Rest) InitRouter() *fiber.App {
 	c := registry.NewAppController()
 	v1 := app.Group("/v1")
 	author := v1.Group("/author")
+	r.AuthorRoutes(author, c)
+
+	return app
+}
+
+func (r *Rest) AuthorRoutes(author fiber.Router, c controller.AppController) {
 	author.Get("/", func(ctx *fiber.Ctx) error {
 		return c.Author.GetAuthors(ctx)
 	})
-	app.Get("/:id", func(ctx *fiber.Ctx) error {
+	author.Get("/:id", func(ctx *fiber.Ctx) error {
 		return c.Author.GetAuthors(ctx)
 	})
-	app.Post("/", func(ctx *fiber.Ctx) error {
+	author.Post("/", func(ctx *fiber.Ctx) error {
 		return c.Author.GetAuthors(ctx)
 	})
-	app.Put("/:id", func(ctx *fiber.Ctx) error {
+	author.Put("/:id", func(ctx *fiber.Ctx) error {
 		return c.Author.GetAuthors(ctx)
 	})
-
-	return app
 }
