@@ -37,6 +37,10 @@ docker:
 
 run:
 	@echo "> Run docker-compose"
-	@docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.mysql.yml up --build -d
+	@docker-compose -f deployments/docker-compose.yml up --build -d
 
-.PHONY: clean install unittest lint-prepare lint docs engine dev test dependencies
+stop:
+	@echo "> Stop docker-compose"
+	@docker-compose -f deployments/docker-compose.yml down
+
+.PHONY: clean install unittest lint-prepare lint docs engine dev test dependencies run stop
