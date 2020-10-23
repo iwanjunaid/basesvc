@@ -3,6 +3,7 @@ package cmd
 import (
 	"database/sql"
 
+	"github.com/iwanjunaid/basesvc/config"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
@@ -14,6 +15,7 @@ var (
 )
 
 func init() {
+	config.ReadConfig()
 	db = InitDB()
 	logger = InitLogger()
 }

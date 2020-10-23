@@ -13,8 +13,8 @@ var rootCommand = &cobra.Command{
 
 func Run() {
 	rootCommand.AddCommand(restCommand)
+
 	if err := rootCommand.Execute(); err != nil {
 		logger.Panic(err)
 	}
-
 }
