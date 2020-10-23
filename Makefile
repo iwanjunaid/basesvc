@@ -27,7 +27,9 @@ lint:
 	./bin/golangci-lint run ./...
  
 docs:
-	swag init -g infrastructure/rest/rest.go
+	@echo "> Generate Swagger Docs"
+	@if ! [ -f swag ]; then go install github.com/swaggo/swag/cmd/swag ; fi
+	@swag init -g infrastructure/rest/rest.go
 
 docker:
 	@echo "> Build Docker image"
