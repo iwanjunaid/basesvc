@@ -1,9 +1,8 @@
 package datastore
 
 import (
-	"log"
-
 	"database/sql"
+	"log"
 
 	_ "github.com/go-sql-driver/mysql"
 )

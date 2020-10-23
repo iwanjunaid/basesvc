@@ -10,4 +10,4 @@ database:
     parseTime: "true"
 
 server:
-  address: 8080
+  address: :8080

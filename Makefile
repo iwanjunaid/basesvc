@@ -1,4 +1,4 @@
-BINARY=basesvc
+BINARY=bin/basesvc
 test: 
 	go test -v -cover -covermode=atomic ./...
 
@@ -24,6 +24,6 @@ lint:
 	./bin/golangci-lint run ./...
  
 docs:
-	swag init -g infrastructure/router/router.go
+	swag init -g infrastructure/rest/rest.go
 
 .PHONY: clean install unittest lint-prepare lint docs engine test dependencies
