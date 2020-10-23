@@ -13,7 +13,6 @@ var rootCommand = &cobra.Command{
 
 func Run() {
 	rootCommand.AddCommand(restCommand)
-	rootCommand.AddCommand(versionCmd)
 
 	if err := rootCommand.Execute(); err != nil {
 		logger.Panic(err)
