@@ -3,6 +3,7 @@ module github.com/iwanjunaid/basesvc
 go 1.15
 
 require (
+	github.com/cenkalti/backoff/v4 v4.0.2
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.5.0
@@ -14,4 +15,5 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	go.mongodb.org/mongo-driver v1.1.0
+	google.golang.org/grpc v1.31.0 // indirect
 )
