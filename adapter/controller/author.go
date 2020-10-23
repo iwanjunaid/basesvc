@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 )
@@ -21,16 +19,19 @@ func NewAuthorController(interactor interactor.AuthorInteractor) AuthorControlle
 	}
 }
 
+// GetAuthors godoc
+// @Summary Get all authors
+// @Description list of authors
+// @Tags authors
+// @Produce json
+// @Success 200 {array} model.Author
+// @Router /authors [get]
 func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	ctx := c.Context()
 	authors, err := a.AuthorInteractor.GetAll(ctx)
 
 	if err != nil {
 		return err
-	}
-
-	if authors != nil {
-		c.Response().SetStatusCode(http.StatusNotFound)
 	}
 
 	return c.JSON(authors)

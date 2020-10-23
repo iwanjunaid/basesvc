@@ -102,28 +102,6 @@ func Configure() {
 	}
 }
 
-func MustSource(s ...Source) {
-	if len(s) == 0 {
-		if errEnv != nil && errFile != nil && errConsul != nil {
-			log.Fatalln("no configuration loaded from any possible source")
-		}
-		return
-	}
-	for _, v := range s {
-		if err := Err(v); err != nil {
-			log.Fatalf("%+v\n", err)
-		}
-	}
-}
-
-func MustLoad(s ...string) {
-	for _, k := range s {
-		if nil == c.Get(k) {
-			log.Fatalf("config [%s] is not defined\n", k)
-		}
-	}
-}
-
 func Err(s Source) error {
 	switch s {
 	case SourceEnv:
@@ -138,4 +116,24 @@ func Err(s Source) error {
 //Config retrieve config instance
 func Config() *viper.Viper {
 	return c
+}
+
+func Get(k string) interface{} {
+	return c.Get(k)
+}
+
+func GetString(k string) string {
+	return c.GetString(k)
+}
+
+func GetInt(k string) int {
+	return c.GetInt(k)
+}
+
+func GetFloat64(k string) float64 {
+	return c.GetFloat64(k)
+}
+
+func GetStringSlice(k string) []string {
+	return c.GetStringSlice(k)
 }
