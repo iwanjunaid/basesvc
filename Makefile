@@ -5,9 +5,7 @@ test:
 engine:
 	go build -o ${BINARY} main.go
 
-dev:
-	@echo "> Run Development Env"
-	@air -c .air.toml
+dev: setup run
 
 dependencies:
 	@echo "> Installing the server dependencies ..."
