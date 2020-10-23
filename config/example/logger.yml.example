@@ -1,0 +1,10 @@
+logger:
+  console:
+    enable: true
+    json: true
+    level: debug
+  file:
+    enable: true
+    json: true
+    level: debug
+    path: /app/logs/

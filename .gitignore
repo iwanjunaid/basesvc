@@ -9,6 +9,9 @@
 !.vscode/extensions.json
 *.code-workspace
 
+### Goland ###
+.idea
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe
@@ -19,6 +22,11 @@
 basesvc
 main
 /tmp/
+
+### configuration files ###
+/config/db/*.yml
+/config/logging/*.yml
+/config/server/*.yml
 
 # Test binary, built with `go test -c`
 *.test

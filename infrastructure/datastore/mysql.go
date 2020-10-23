@@ -1,19 +1,20 @@
 package datastore
 
 import (
-	"database/sql"
 	"fmt"
+	"github.com/iwanjunaid/basesvc/config"
 	"log"
 
+	"database/sql"
+
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/iwanjunaid/basesvc/config"
 )
 
-func NewDB() *sql.DB {
-	DBMS := `mysql`
-	conn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.C.Database.User, config.C.Database.Password, config.C.Database.Host, config.C.Database.Port, config.C.Database.DBName)
+func NewDB(config *config.Config) *sql.DB {
+	conn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.Master.Mysql.User, config.Database.Master.Mysql.Password, config.Database.Master.Mysql.Host, config.Database.Master.Mysql.Port, config.Database.Master.Mysql.DBName)
+	fmt.Println(conn)
 
-	db, err := sql.Open(DBMS, conn)
+	db, err := sql.Open(config.Database.Master.Mysql.Adapter, conn)
 
 	if err != nil {
 		log.Fatalln(err)

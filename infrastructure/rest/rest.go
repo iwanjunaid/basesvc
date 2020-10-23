@@ -2,14 +2,17 @@ package rest
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/iwanjunaid/basesvc/adapter/controller"
+	"github.com/iwanjunaid/basesvc/shared/logger"
 	_ "github.com/iwanjunaid/basesvc/docs"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
 	"github.com/iwanjunaid/basesvc/registry"
@@ -40,12 +43,20 @@ func NewRest(port string, db *sql.DB) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
-	app.Use(logger.New())
 	app.Use(recover.New())
 	app.Use("/swagger", swagger.Handler)
 
 	registry := registry.NewRegistry(db)
 	appController := registry.NewAppController()
+
+	// adding graceful shutdown
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		_ = <-c
+		logger.WithFields(logger.Fields{"component": "api_command"}).Infof("gracefully shutting down service...")
+		_ = app.Shutdown()
+	}()
 
 	r := &RestImpl{
 		db:            db,
@@ -61,7 +72,7 @@ func NewRest(port string, db *sql.DB) *RestImpl {
 }
 
 func (r *RestImpl) Serve() {
-	if err := r.router.Listen(r.port); err != nil {
+	if err := r.router.Listen(fmt.Sprintf(":%s",r.port)); err != nil {
 		log.Fatalln(err)
 	}
 }

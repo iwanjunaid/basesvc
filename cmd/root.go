@@ -1,21 +1,20 @@
 package cmd
 
 import (
+	"github.com/iwanjunaid/basesvc/shared/logger"
 	"github.com/spf13/cobra"
 )
 
 var rootCommand = &cobra.Command{
 	Use: "basesvc",
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Println("root command")
+		logger.Infof ("root command")
 	},
 }
 
 func Run() {
 	rootCommand.AddCommand(restCommand)
-	rootCommand.AddCommand(versionCmd)
-
 	if err := rootCommand.Execute(); err != nil {
-		logger.Panic(err)
+		logger.Panicf("%v",err)
 	}
 }

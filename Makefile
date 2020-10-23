@@ -39,8 +39,14 @@ run:
 	@echo "> Run docker-compose"
 	@docker-compose -f deployments/docker-compose.yml up --build -d
 
+setup:
+	@cp config/example/mysql.yml.example config/db/mysql.yml
+	@cp config/example/rest.yml.example config/server/rest.yml
+	@cp config/example/logger.yml.example config/logging/logger.yml
+
+
 stop:
 	@echo "> Stop docker-compose"
 	@docker-compose -f deployments/docker-compose.yml down
 
-.PHONY: clean install unittest lint-prepare lint docs engine dev test dependencies run stop
+.PHONY: clean install unittest lint-prepare lint docs engine dev test setup dependencies run stop
