@@ -7,6 +7,6 @@ services:
       dockerfile: ./build/Dockerfile
     container_name: basesvc_api
     ports:
-      - 9090:9090
+      - 8080:8080
     volumes: 
       - ../.:/app
