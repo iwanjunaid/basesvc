@@ -28,11 +28,11 @@ lint:
  
 docs:
 	@echo "> Generate Swagger Docs"
-	@if ! [ -f swag ]; then go install github.com/swaggo/swag/cmd/swag ; fi
+	@if ! command -v swag &> /dev/null; then go install github.com/swaggo/swag/cmd/swag ; fi
 	@swag init -g infrastructure/rest/rest.go
 
 docker:
-	@echo "> Build Docker image"
+	@echo "> Build Docker image [PRODUCTION]"
 	@docker build -t basesvc -f build/Dockerfile . 
 
 run:

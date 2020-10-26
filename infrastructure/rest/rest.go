@@ -12,10 +12,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/iwanjunaid/basesvc/adapter/controller"
-	"github.com/iwanjunaid/basesvc/shared/logger"
 	_ "github.com/iwanjunaid/basesvc/docs"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
 	"github.com/iwanjunaid/basesvc/registry"
+	"github.com/iwanjunaid/basesvc/shared/logger"
 )
 
 type RestImpl struct {
@@ -72,7 +72,7 @@ func NewRest(port string, db *sql.DB) *RestImpl {
 }
 
 func (r *RestImpl) Serve() {
-	if err := r.router.Listen(fmt.Sprintf(":%s",r.port)); err != nil {
+	if err := r.router.Listen(fmt.Sprintf(":%s", r.port)); err != nil {
 		log.Fatalln(err)
 	}
 }
