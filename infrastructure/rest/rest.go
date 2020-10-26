@@ -2,7 +2,8 @@ package rest
 
 import (
 	"database/sql"
-	"log"
+	"os"
+	"os/signal"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -10,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/iwanjunaid/basesvc/adapter/controller"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
+	log "github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/registry"
 )
 
@@ -26,6 +28,15 @@ func NewRest(port string, db *sql.DB) *RestImpl {
 	app.Use(cors.New())
 	app.Use(logger.New())
 	app.Use(recover.New())
+
+	// add graceful shutdown when interrupt signal detected
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		_ = <-c
+		log.Infof ("server gracefully shutting down...")
+		_ = app.Shutdown()
+	}()
 
 	registry := registry.NewRegistry(db)
 	appController := registry.NewAppController()
@@ -48,7 +59,7 @@ func NewRest(port string, db *sql.DB) *RestImpl {
 
 func (r *RestImpl) Serve() {
 	if err := r.router.Listen(r.port); err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 }
 
