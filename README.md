@@ -19,20 +19,17 @@ $ cd basesvc
 # Setup config and edit config 
 $ make setup
 
-# Build the docker image first
-$ make docker
-
-# Run the application
-$ make run
-
-# or just want to run the application in development mode
+# run the application in development env
 $ make dev
+
+# or run the application in production env
+$ make prod
 
 # check if the containers are running
 $ docker ps
 
 # Execute the call
-$ curl http://localhost:9090/authors
+$ curl http://localhost:8080/authors
 
 # Stop
 $ make stop

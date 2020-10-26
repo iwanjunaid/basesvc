@@ -8,7 +8,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN make setup
 RUN make docs
 RUN make dependencies
 RUN make engine

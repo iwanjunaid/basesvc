@@ -5,7 +5,9 @@ test:
 engine:
 	go build -o ${BINARY} main.go
 
-dev: setup run
+dev: setup run-dev
+
+prod: setup docker run-prod
 
 dependencies:
 	@echo "> Installing the server dependencies ..."
@@ -35,8 +37,12 @@ docker:
 	@echo "> Build Docker image [PRODUCTION]"
 	@docker build -t basesvc -f build/Dockerfile . 
 
-run:
-	@echo "> Run docker-compose"
+run-dev:
+	@echo "> Run docker-compose [DEV]"
+	@docker-compose -f deployments/docker-compose.dev.yml up --build -d
+
+run-prod:
+	@echo "> Run docker [PRODUCTION]"
 	@docker-compose -f deployments/docker-compose.yml up --build -d
 
 setup:
@@ -49,4 +55,4 @@ stop:
 	@echo "> Stop docker-compose"
 	@docker-compose -f deployments/docker-compose.yml down
 
-.PHONY: clean install unittest lint-prepare lint docs engine dev test setup dependencies run stop
+.PHONY: clean install unittest lint-prepare lint docs engine dev prod test setup dependencies run-dev run-prod stop
