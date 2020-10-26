@@ -4,9 +4,14 @@ import (
 	"database/sql"
 
 	"github.com/iwanjunaid/basesvc/config"
-	log "github.com/sirupsen/logrus"
-
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
+	log "github.com/sirupsen/logrus"
+)
+
+const (
+	CfgMySql   = "database.mysql"
+	CfgMongoDB = "database.mysql"
+	CfgRedis   = "database.redis"
 )
 
 var (
@@ -15,14 +20,13 @@ var (
 )
 
 func init() {
-	config.ReadConfig()
+	config.Configure()
 	db = InitDB()
 	logger = InitLogger()
 }
 
 func InitDB() (db *sql.DB) {
-	db = datastore.NewDB()
-
+	db = datastore.NewDB("mysql", config.GetString(CfgMySql))
 	return
 }
 

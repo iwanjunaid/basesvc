@@ -1,0 +1,19 @@
+{
+  "host": {
+    "address": ":7777"
+  },
+  "database": {
+    "mysql": {
+      "write": "user:password@tcp(host:port)/database_name",
+    },
+    "redis": {
+      "host": "localhost:6379",
+      "password": "",
+      "db": 1
+    },
+    "mongo": {
+      "uri": "",
+      "db": "basesvc"
+    }
+  }
+}
