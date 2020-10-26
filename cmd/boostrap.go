@@ -9,20 +9,25 @@ import (
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
 )
 
+const (
+	CfgMySql   = "database.mysql"
+	CfgMongoDB = "database.mysql"
+	CfgRedis   = "database.redis"
+)
+
 var (
 	logger *log.Logger
 	db     *sql.DB
 )
 
 func init() {
-	config.ReadConfig()
+	config.Configure()
 	db = InitDB()
 	logger = InitLogger()
 }
 
 func InitDB() (db *sql.DB) {
-	db = datastore.NewDB()
-
+	db = datastore.NewDB("mysql", config.GetString(CfgMySql))
 	return
 }
 
