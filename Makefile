@@ -1,14 +1,19 @@
-BINARY=basesvc
+BINARY=bin/basesvc
 test: 
 	go test -v -cover -covermode=atomic ./...
 
 engine:
 	go build -o ${BINARY} main.go
 
+dev: setup run-dev
+
+prod: setup docker run-prod
+
 dependencies:
 	@echo "> Installing the server dependencies ..."
 	@go mod tidy -v
 	@go install github.com/swaggo/swag/cmd/swag
+	@go get -u github.com/cosmtrek/air
 
 unittest:
 	go test -short  ./...
@@ -24,6 +29,28 @@ lint:
 	./bin/golangci-lint run ./...
  
 docs:
-	swag init -g infrastructure/router/router.go
+	@echo "> Generate Swagger Docs"
+	@if ! command -v swag &> /dev/null; then go install github.com/swaggo/swag/cmd/swag ; fi
+	@swag init -g infrastructure/rest/rest.go
 
-.PHONY: clean install unittest lint-prepare lint docs engine test dependencies
+docker:
+	@echo "> Build Docker image [PRODUCTION]"
+	@docker build -t basesvc -f build/Dockerfile . 
+
+run-dev:
+	@echo "> Run docker-compose [DEV]"
+	@docker-compose -f deployments/docker-compose.dev.yml up --build -d
+
+run-prod:
+	@echo "> Run docker [PRODUCTION]"
+	@docker-compose -f deployments/docker-compose.yml up --build -d
+
+setup:
+	@if ! [ -f ".env" ]; then cp .env.dist .env ; fi
+	@if ! [ -f "basesvc.config.json" ]; then cp basesvc.config.json.dist basesvc.config.json ; fi
+
+stop:
+	@echo "> Stop docker-compose"
+	@docker-compose -f deployments/docker-compose.yml down
+
+.PHONY: clean install unittest lint-prepare lint docs engine dev prod test setup dependencies run-dev run-prod stop
