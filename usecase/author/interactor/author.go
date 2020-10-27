@@ -10,12 +10,15 @@ import (
 
 type AuthorInteractor interface {
 	GetAll(ctx context.Context) ([]*model.Author, error)
+	InsertDocument(ctx context.Context, author *model.Author) error
 }
 
 type AuthorInteractorImpl struct {
 	AuthorRepository repository.AuthorRepository
 	AuthorPresenter  presenter.AuthorPresenter
 }
+
+type Option func(impl *AuthorInteractorImpl)
 
 func NewAuthorInteractor(r repository.AuthorRepository, p presenter.AuthorPresenter) AuthorInteractor {
 	return &AuthorInteractorImpl{r, p}
@@ -29,4 +32,8 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, er
 	}
 
 	return ai.AuthorPresenter.ResponseUsers(ctx, authors)
+}
+
+func (ai *AuthorInteractorImpl) InsertDocument(ctx context.Context, author *model.Author) (err error) {
+	return
 }

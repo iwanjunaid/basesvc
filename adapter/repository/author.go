@@ -3,8 +3,12 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
+	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
 )
@@ -12,13 +16,21 @@ import (
 const authorsTable = "authors"
 
 type AuthorRepositoryImpl struct {
-	db *sql.DB
+	db  *sql.DB
+	kp  *kafka.Producer
+	mdb *mongo.Database
 }
 
-func NewAuthorRepository(db *sql.DB) repository.AuthorRepository {
-	return &AuthorRepositoryImpl{
-		db: db,
+type Option func(impl *AuthorRepositoryImpl)
+
+func NewAuthorRepository(db *sql.DB, kp *kafka.Producer, mdb *mongo.Database) repository.AuthorRepository {
+	repo := &AuthorRepositoryImpl{
+		db:  db,
+		kp:  kp,
+		mdb: mdb,
 	}
+
+	return repo
 }
 
 func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
@@ -51,4 +63,30 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 	}
 
 	return authors, nil
+}
+
+func (author *AuthorRepositoryImpl) InsertDocument(ctx context.Context) error {
+	panic("implement me")
+}
+
+func (author *AuthorRepositoryImpl) Publish(ctx context.Context, topic string, message []byte) (err error) {
+	deliveryChan := make(chan kafka.Event)
+
+	err = author.kp.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+		Value:          message,
+	}, deliveryChan)
+
+	e := <-deliveryChan
+
+	m := e.(*kafka.Message)
+	if m.TopicPartition.Error != nil {
+		return errors.New(fmt.Sprintf("Delivery failed: %v\n", m.TopicPartition.Error))
+	} else {
+		return errors.New(fmt.Sprintf("Delivered message to topic %s [%d] at offset %v\n",
+			*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset))
+	}
+
+	close(deliveryChan)
+	return
 }

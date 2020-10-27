@@ -3,6 +3,8 @@ package cmd
 import (
 	"database/sql"
 
+	"go.mongodb.org/mongo-driver/mongo"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/iwanjunaid/basesvc/config"
 	log "github.com/sirupsen/logrus"
@@ -12,11 +14,12 @@ import (
 
 const (
 	CfgMySql      = "database.mysql"
-	CfgMongoDB    = "database.mysql"
 	CfgRedis      = "database.redis"
 	CfgKafkaGroup = "kafka.groupID"
 	CfgKafkaHost  = "kafka.host"
 	CfgKafkaTopic = "kafka.topic"
+	CfgMongoURI   = "database.mongo.uri"
+	CfgMongoDB    = "database.mongo.db"
 )
 
 var (
@@ -24,6 +27,7 @@ var (
 	db     *sql.DB
 	kc     *kafka.Consumer
 	kp     *kafka.Producer
+	mdb    *mongo.Database
 )
 
 func init() {
@@ -32,6 +36,7 @@ func init() {
 	logger = InitLogger()
 	kc = InitKafkaConsumer()
 	kp = InitKafkaProducer()
+	mdb = InitMongoConnect()
 }
 
 func InitDB() (db *sql.DB) {
@@ -51,4 +56,8 @@ func InitKafkaConsumer() *kafka.Consumer {
 
 func InitKafkaProducer() *kafka.Producer {
 	return datastore.NewKafkaProducer(config.GetString(CfgKafkaHost))
+}
+
+func InitMongoConnect() *mongo.Database {
+	return datastore.MongoMustConnect(config.GetString(CfgMongoURI), config.GetString(CfgMongoDB))
 }

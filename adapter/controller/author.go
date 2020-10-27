@@ -2,11 +2,13 @@ package controller
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 )
 
 type AuthorController interface {
 	GetAuthors(c *fiber.Ctx) error
+	InsertAuthorDocument(author *model.Author) error
 }
 
 type AuthorControllerImpl struct {
@@ -35,4 +37,8 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(authors)
+}
+
+func (a *AuthorControllerImpl) InsertAuthorDocument(author *model.Author) error {
+	return nil
 }
