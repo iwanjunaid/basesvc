@@ -25,9 +25,8 @@ main
 **/*.go
 
 ### configuration files ###
-/config/db/*.yml
-/config/logging/*.yml
-/config/server/*.yml
+.env
+basesvc.config.json
 bin/
 
 # Test binary, built with `go test -c`
