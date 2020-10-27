@@ -11,11 +11,11 @@ import (
 
 const (
 	CfgMySql   = "database.mysql"
-	CfgMongoDB = "database.mysql"
+	CfgMongoDB = "database.mongo"
 	CfgRedis   = "database.redis"
 )
 
-var db     *sql.DB
+var db *sql.DB
 
 func init() {
 	config.Configure()
