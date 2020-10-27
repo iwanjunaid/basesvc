@@ -1,0 +1,25 @@
+database:
+    master:
+      mysql:
+        user: root
+        password: 123457
+        net: tcp
+        host: 127.0.0.1
+        port: 3306
+        dbname: basesvc
+        allowNativePasswords: true
+        adapter: mysql
+        params:
+          parseTime: "true"
+    slave:
+      mysql:
+        user: root
+        password: 123456
+        net: tcp
+        host: 127.0.0.1
+        port: 3306
+        dbname: basesvc
+        allowNativePasswords: true
+        adapter: mysql
+        params:
+          parseTime: "true"

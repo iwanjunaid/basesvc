@@ -66,7 +66,10 @@ func NewRest(port string, db *sql.DB) *RestImpl {
 	}
 
 	group.InitRoot(r)
+	group.InitV1(r)
+	group.InitV2(r)
 	group.InitAuthorV1(r)
+	group.InitAuthorV2(r)
 
 	return r
 }

@@ -13,7 +13,6 @@ require (
 	github.com/go-openapi/spec v0.19.10 // indirect
 	github.com/go-openapi/swag v0.19.10 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/gofiber/fiber/v2 v2.1.0
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/klauspost/compress v1.11.1 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
@@ -26,5 +25,13 @@ require (
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974 // indirect
 	golang.org/x/sys v0.0.0-20201022201747-fb209a7c41cd // indirect
 	golang.org/x/tools v0.0.0-20201021122455-2be66b663cb6 // indirect
+	github.com/cenkalti/backoff/v4 v4.1.0
+	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/gofiber/fiber/v2 v2.1.1
+	github.com/golang-migrate/migrate/v4 v4.13.0 // indirect
+	github.com/joho/godotenv v1.3.0
+	github.com/pkg/errors v0.9.1
+	go.mongodb.org/mongo-driver v1.4.2
+	google.golang.org/grpc/examples v0.0.0-20201026143318-e8e22874d164 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )

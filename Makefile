@@ -1,4 +1,4 @@
-BINARY=basesvc
+BINARY=bin/basesvc
 test: 
 	go test -v -cover -covermode=atomic ./...
 

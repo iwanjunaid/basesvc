@@ -1,0 +1,5 @@
+server:
+  rest:
+    tls: false
+    host:
+    port: 8080

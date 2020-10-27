@@ -28,6 +28,7 @@ main
 /config/db/*.yml
 /config/logging/*.yml
 /config/server/*.yml
+bin/
 
 # Test binary, built with `go test -c`
 *.test

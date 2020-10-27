@@ -1,9 +1,8 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
+	"github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 )
 
@@ -33,11 +32,8 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	authors, err := a.AuthorInteractor.GetAll(ctx)
 
 	if err != nil {
+		logger.WithFields(logger.Fields{"controller": "get authors"}).Errorf("%v", err)
 		return err
-	}
-
-	if authors != nil {
-		c.Response().SetStatusCode(http.StatusNotFound)
 	}
 
 	return c.JSON(authors)
