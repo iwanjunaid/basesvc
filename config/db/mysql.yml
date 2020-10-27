@@ -2,7 +2,7 @@ database:
     master:
       mysql:
         user: root
-        password: 123457
+        password: 123456
         net: tcp
         host: 127.0.0.1
         port: 3306
