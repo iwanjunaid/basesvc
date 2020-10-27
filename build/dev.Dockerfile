@@ -10,4 +10,4 @@ COPY . .
 RUN make docs
 RUN make dependencies
 
-CMD ["air", "-c", "/app/config/.air.toml"]
+CMD ["air", "-c", "/app/.air.toml"]
