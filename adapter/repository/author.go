@@ -15,25 +15,31 @@ import (
 
 const authorsTable = "authors"
 
-type AuthorRepositoryImpl struct {
+type AuthorRepositoryWriterImpl struct {
 	db  *sql.DB
-	kp  *kafka.Producer
 	mdb *mongo.Database
 }
 
-type Option func(impl *AuthorRepositoryImpl)
+func (author *AuthorRepositoryWriterImpl) InsertDocument(ctx context.Context) error {
+	panic("implement me")
+}
 
-func NewAuthorRepository(db *sql.DB, kp *kafka.Producer, mdb *mongo.Database) repository.AuthorRepository {
-	repo := &AuthorRepositoryImpl{
+func (author *AuthorRepositoryWriterImpl) Publish(ctx context.Context, topic string, message []byte) (err error) {
+	panic("implement me")
+}
+
+type Option func(impl *AuthorRepositoryWriterImpl)
+
+func NewAuthorRepositoryWriter(db *sql.DB, kp *kafka.Producer, mdb *mongo.Database) repository.AuthorRepository {
+	repo := &AuthorRepositoryWriterImpl{
 		db:  db,
-		kp:  kp,
 		mdb: mdb,
 	}
 
 	return repo
 }
 
-func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
+func (author *AuthorRepositoryWriterImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
 	query := fmt.Sprintf("SELECT id, name, email FROM %s", authorsTable)
 
 	rows, err := author.db.QueryContext(ctx, query)
