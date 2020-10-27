@@ -46,8 +46,8 @@ run-prod:
 	@docker-compose -f deployments/docker-compose.yml up --build -d
 
 setup:
-	@cp .env.dist .env
-	@cp basesvc.config.json.dist basesvc.config.json
+	@if ! [ -f ".env" ]; then cp .env.dist .env ; fi
+	@if ! [ -f "basesvc.config.json" ]; then cp basesvc.config.json.dist basesvc.config.json ; fi
 
 stop:
 	@echo "> Stop docker-compose"
