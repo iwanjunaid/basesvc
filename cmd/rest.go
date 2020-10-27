@@ -13,7 +13,7 @@ var restCommand = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		defer logger.WithField("component", "api_command").Println("Run done")
-		rest.NewRest(config.GetString("host.address"), db).Serve()
+		rest.NewRest(config.GetString("REST_PORT"), db).Serve()
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 		defer db.Close()
