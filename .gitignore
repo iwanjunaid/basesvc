@@ -19,6 +19,8 @@
 *.dll
 *.so
 *.dylib
+basesvc
+main
 bin/
 
 # Test binary, built with `go test -c`
