@@ -3,10 +3,10 @@ package controller
 import (
 	"net/http"
 
+	"github.com/RoseRocket/xerrs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
-	"github.com/roserocket/xerrs"
 
 	log "github.com/sirupsen/logrus"
 )
