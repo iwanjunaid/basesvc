@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/iwanjunaid/basesvc/internal/logger"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -45,6 +46,7 @@ func (author *AuthorRepositoryWriterImpl) FindAll(ctx context.Context) ([]*model
 	rows, err := author.db.QueryContext(ctx, query)
 
 	if err != nil {
+		logger.WithFields(logger.Fields{"repository": "get authors"}).Errorf("%v", err)
 		return nil, err
 	}
 
@@ -62,6 +64,7 @@ func (author *AuthorRepositoryWriterImpl) FindAll(ctx context.Context) ([]*model
 		err := rows.Scan(&id, &name, &email)
 
 		if err != nil {
+			logger.WithFields(logger.Fields{"repository": "get authors"}).Errorf("%v", err)
 			return nil, err
 		}
 

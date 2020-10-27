@@ -9,6 +9,9 @@
 !.vscode/extensions.json
 *.code-workspace
 
+### Goland ###
+.idea
+
 ### Go ###
 # Binaries for programs and plugins
 *.exe

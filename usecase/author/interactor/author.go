@@ -14,18 +14,20 @@ type AuthorInteractor interface {
 }
 
 type AuthorInteractorImpl struct {
-	AuthorRepository repository.AuthorRepository
-	AuthorPresenter  presenter.AuthorPresenter
+	AuthorRepositoryReader         repository.AuthorRepository
+	AuthorRepositoryWriter         repository.AuthorRepository
+	AuthorRepositoryEventPublisher repository.AuthorRepository
+	AuthorPresenter                presenter.AuthorPresenter
 }
 
 type Option func(impl *AuthorInteractorImpl)
 
-func NewAuthorInteractor(r repository.AuthorRepository, p presenter.AuthorPresenter) AuthorInteractor {
+func NewAuthorInteractor(r repository.AuthorRepositoryWriter, p presenter.AuthorPresenter) AuthorInteractor {
 	return &AuthorInteractorImpl{r, p}
 }
 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, error) {
-	authors, err := ai.AuthorRepository.FindAll(ctx)
+	authors, err := ai.AuthorRepositoryReader.FindAll(ctx)
 
 	if err != nil {
 		return nil, err

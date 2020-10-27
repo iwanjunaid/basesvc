@@ -124,6 +124,10 @@ func GetString(k string) string {
 	return c.GetString(k)
 }
 
+func GetBool(k string) bool {
+	return c.GetBool(k)
+}
+
 func GetInt(k string) int {
 	return c.GetInt(k)
 }

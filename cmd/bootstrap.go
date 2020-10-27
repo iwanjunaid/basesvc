@@ -2,14 +2,14 @@ package cmd
 
 import (
 	"database/sql"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/iwanjunaid/basesvc/config"
-	log "github.com/sirupsen/logrus"
-
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
+	log "github.com/iwanjunaid/basesvc/internal/logger"
 )
 
 const (
@@ -32,6 +32,8 @@ var (
 
 func init() {
 	config.Configure()
+
+	config.Configure()
 	db = InitDB()
 	logger = InitLogger()
 	kc = InitKafkaConsumer()
@@ -44,10 +46,20 @@ func InitDB() (db *sql.DB) {
 	return
 }
 
-func InitLogger() *log.Logger {
-	log.SetFormatter(&log.JSONFormatter{})
-	l := log.StandardLogger()
-	return l
+func InitLogger() {
+	logger := log.Configuration{
+		EnableConsole:     config.GetBool("logger.console.enable"),
+		ConsoleJSONFormat: config.GetBool("logger.console.json"),
+		ConsoleLevel:      config.GetString("logger.console.level"),
+		EnableFile:        config.GetBool("logger.file.enable"),
+		FileJSONFormat:    config.GetBool("logger.file.json"),
+		FileLevel:         config.GetString("logger.file.level"),
+		FileLocation:      config.GetString("logger.file.path"),
+	}
+
+	if err := log.NewLogger(logger, log.InstanceZapLogger); err != nil {
+		panic(fmt.Sprintf("could not instantiate log %v", err))
+	}
 }
 
 func InitKafkaConsumer() *kafka.Consumer {
