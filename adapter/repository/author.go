@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/iwanjunaid/basesvc/internal/logger"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
@@ -27,6 +28,7 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 	rows, err := author.db.QueryContext(ctx, query)
 
 	if err != nil {
+		logger.WithFields(logger.Fields{"repository": "get authors"}).Errorf("%v", err)
 		return nil, err
 	}
 
@@ -44,6 +46,7 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 		err := rows.Scan(&id, &name, &email)
 
 		if err != nil {
+			logger.WithFields(logger.Fields{"repository": "get authors"}).Errorf("%v", err)
 			return nil, err
 		}
 
