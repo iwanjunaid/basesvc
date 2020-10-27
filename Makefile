@@ -46,10 +46,8 @@ run-prod:
 	@docker-compose -f deployments/docker-compose.yml up --build -d
 
 setup:
-	@cp config/example/mysql.yml.example config/db/mysql.yml
-	@cp config/example/rest.yml.example config/server/rest.yml
-	@cp config/example/logger.yml.example config/logging/logger.yml
-
+	@cp .env.dist .env
+	@cp basesvc.config.json.dist basesvc.config.json
 
 stop:
 	@echo "> Stop docker-compose"
