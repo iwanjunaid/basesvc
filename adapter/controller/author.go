@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/RoseRocket/xerrs"
@@ -37,12 +38,15 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	authors, err := a.AuthorInteractor.GetAll(ctx)
 
 	if err != nil {
+		fmt.Println("disini")
 		logger.LogEntrySetFields(c, log.Fields{
 			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
 			"context":     "GetAuthors",
 			"resp_status": http.StatusInternalServerError,
 		})
+		c.Status(500)
 		return err
+
 	}
 
 	return c.JSON(authors)

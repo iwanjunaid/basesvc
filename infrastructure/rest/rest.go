@@ -8,10 +8,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 
-	mlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/iwanjunaid/basesvc/adapter/controller"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
+	logInternal "github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/registry"
 	logger "github.com/sirupsen/logrus"
 )
@@ -29,8 +29,7 @@ func NewRest(port string, logg *logger.Logger, db *sql.DB) *RestImpl {
 
 	app.Use(cors.New())
 	app.Use(recover.New())
-	app.Use(mlogger.New())
-	//app.Use(log.RequestLogger(logg))
+	app.Use(logInternal.RequestLogger(logg))
 
 	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)

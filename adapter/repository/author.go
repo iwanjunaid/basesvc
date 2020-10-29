@@ -5,6 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/pkg/errors"
+
+	"github.com/RoseRocket/xerrs"
+
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
 )
@@ -27,7 +31,7 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 	rows, err := author.db.QueryContext(ctx, query)
 
 	if err != nil {
-		return nil, err
+		return nil, xerrs.Mask(err, errors.New("error query"))
 	}
 
 	defer rows.Close()
@@ -44,7 +48,7 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 		err := rows.Scan(&id, &name, &email)
 
 		if err != nil {
-			return nil, err
+			return nil, xerrs.Mask(err, errors.New("error query"))
 		}
 
 		authors = append(authors, &model.Author{ID: uint(id.Int32), Name: name.String, Email: email.String})
