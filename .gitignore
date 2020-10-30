@@ -26,7 +26,7 @@ main
 
 ### configuration files ###
 .env
-basesvc.config.json
+config.json
 bin/
 
 # Test binary, built with `go test -c`
