@@ -23,7 +23,6 @@ WORKDIR /app
 
 EXPOSE 8080
 
-COPY --from=builder /app/config /app/config
 COPY --from=builder /app/basesvc /app
 
 CMD ["/app/basesvc", "api"]
