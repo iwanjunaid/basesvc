@@ -47,7 +47,7 @@ run-prod:
 
 setup:
 	@if ! [ -f ".env" ]; then cp .env.dist .env ; fi
-	@if ! [ -f "basesvc.config.json" ]; then cp basesvc.config.json.dist basesvc.config.json ; fi
+	@if ! [ -f "config.json" ]; then cp config.json.dist config.json ; fi
 
 stop:
 	@echo "> Stop docker-compose"
