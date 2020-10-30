@@ -1,0 +1,10 @@
+version: "3"
+services:
+  api:
+    image: basesvc
+    build:
+      context: ../.
+      dockerfile: ./build/Dockerfile
+    container_name: basesvc_api
+    ports:
+      - 8080:8080
