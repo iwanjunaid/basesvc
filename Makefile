@@ -11,7 +11,7 @@ prod: setup docker run-prod
 
 dependencies:
 	@echo "> Installing the server dependencies ..."
-	@go mod download -v
+	@go mod download
 	@go install github.com/swaggo/swag/cmd/swag
 	@go get -u github.com/cosmtrek/air
 
