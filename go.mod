@@ -20,6 +20,5 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/swag v1.6.9
 	go.mongodb.org/mongo-driver v1.4.2
-	go.uber.org/zap v1.10.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
