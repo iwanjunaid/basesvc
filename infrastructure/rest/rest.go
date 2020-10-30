@@ -3,7 +3,6 @@ package rest
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 
@@ -14,8 +13,9 @@ import (
 	"github.com/iwanjunaid/basesvc/adapter/controller"
 	_ "github.com/iwanjunaid/basesvc/docs"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
+	logInternal "github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/registry"
-	"github.com/iwanjunaid/basesvc/shared/logger"
+	logger "github.com/sirupsen/logrus"
 )
 
 type RestImpl struct {
@@ -23,6 +23,7 @@ type RestImpl struct {
 	db            *sql.DB
 	router        *fiber.App
 	appController *controller.AppController
+	log           *logger.Logger
 }
 
 // @title BaseSVC API
@@ -39,24 +40,25 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port string, db *sql.DB) *RestImpl {
+func NewRest(port string, logg *logger.Logger, db *sql.DB) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
 	app.Use(recover.New())
 	app.Use("/swagger", swagger.Handler)
+	app.Use(logInternal.RequestLogger(logg))
 
-	registry := registry.NewRegistry(db)
-	appController := registry.NewAppController()
-
-	// adding graceful shutdown
+	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		_ = <-c
-		logger.WithFields(logger.Fields{"component": "api_command"}).Infof("gracefully shutting down service...")
+		logg.Infof("server gracefully shutting down...")
 		_ = app.Shutdown()
 	}()
+
+	registry := registry.NewRegistry(db)
+	appController := registry.NewAppController()
 
 	r := &RestImpl{
 		db:            db,
@@ -76,7 +78,7 @@ func NewRest(port string, db *sql.DB) *RestImpl {
 
 func (r *RestImpl) Serve() {
 	if err := r.router.Listen(fmt.Sprintf(":%s", r.port)); err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 }
 

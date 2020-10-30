@@ -1,6 +1,7 @@
 {
-  "host": {
-    "address": "8080"
+  "rest": {
+    "host": "127.0.0.1",
+    "port": "8080"
   },
   "database": {
     "mysql": {
