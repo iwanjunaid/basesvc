@@ -19,7 +19,7 @@ import (
 )
 
 type RestImpl struct {
-	port          string
+	port          int
 	db            *sql.DB
 	router        *fiber.App
 	appController *controller.AppController
@@ -40,7 +40,7 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port string, logg *logger.Logger, db *sql.DB) *RestImpl {
+func NewRest(port int, logg *logger.Logger, db *sql.DB) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
@@ -77,7 +77,7 @@ func NewRest(port string, logg *logger.Logger, db *sql.DB) *RestImpl {
 }
 
 func (r *RestImpl) Serve() {
-	if err := r.router.Listen(fmt.Sprintf(":%s", r.port)); err != nil {
+	if err := r.router.Listen(fmt.Sprintf(":%d", r.port)); err != nil {
 		panic(err)
 	}
 }
