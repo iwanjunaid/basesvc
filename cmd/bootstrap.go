@@ -2,25 +2,29 @@ package cmd
 
 import (
 	"database/sql"
-	"fmt"
 
+	"github.com/evalphobia/logrus_sentry"
 	"github.com/iwanjunaid/basesvc/config"
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
-	log "github.com/iwanjunaid/basesvc/internal/logger"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
-	CfgMySql   = "database.mysql"
-	CfgMongoDB = "database.mysql"
-	CfgRedis   = "database.redis"
+	CfgMySql     = "database.mysql"
+	CfgMongoDB   = "database.mysql"
+	CfgRedis     = "database.redis"
+	CfgSentryKey = "sentry.key"
 )
 
-var db     *sql.DB
+var (
+	db     *sql.DB
+	logger *log.Logger
+)
 
 func init() {
 	config.Configure()
 	db = InitDB()
-	InitLogger()
+	logger = InitLogger()
 }
 
 func InitDB() (db *sql.DB) {
@@ -28,18 +32,19 @@ func InitDB() (db *sql.DB) {
 	return
 }
 
-func InitLogger() {
-	logger := log.Configuration{
-		EnableConsole:     config.GetBool("logger.console.enable"),
-		ConsoleJSONFormat: config.GetBool("logger.console.json"),
-		ConsoleLevel:      config.GetString("logger.console.level"),
-		EnableFile:        config.GetBool("logger.file.enable"),
-		FileJSONFormat:    config.GetBool("logger.file.json"),
-		FileLevel:         config.GetString("logger.file.level"),
-		FileLocation:      config.GetString("logger.file.path"),
+func InitLogger() *log.Logger {
+	log.SetFormatter(&log.JSONFormatter{})
+	l := log.StandardLogger()
+	if dsn := config.GetString(CfgSentryKey); len(dsn) > 0 {
+		hook, err := logrus_sentry.NewSentryHook(dsn, []log.Level{
+			log.PanicLevel,
+			log.FatalLevel,
+			log.ErrorLevel,
+		})
+		if err == nil {
+			hook.StacktraceConfiguration.Enable = true
+			l.Hooks.Add(hook)
+		}
 	}
-
-	if err := log.NewLogger(logger, log.InstanceZapLogger); err != nil {
-		panic(fmt.Sprintf("could not instantiate log %v", err))
-	}
+	return l
 }

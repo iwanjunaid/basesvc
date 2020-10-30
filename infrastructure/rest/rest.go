@@ -7,12 +7,13 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/iwanjunaid/basesvc/adapter/controller"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
-	log "github.com/iwanjunaid/basesvc/internal/logger"
+	logInternal "github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/registry"
+	logger "github.com/sirupsen/logrus"
 )
 
 type RestImpl struct {
@@ -20,21 +21,22 @@ type RestImpl struct {
 	db            *sql.DB
 	router        *fiber.App
 	appController *controller.AppController
+	log           *logger.Logger
 }
 
-func NewRest(port string, db *sql.DB) *RestImpl {
+func NewRest(port string, logg *logger.Logger, db *sql.DB) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
-	app.Use(logger.New())
 	app.Use(recover.New())
+	app.Use(logInternal.RequestLogger(logg))
 
 	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		_ = <-c
-		log.Infof ("server gracefully shutting down...")
+		logg.Infof("server gracefully shutting down...")
 		_ = app.Shutdown()
 	}()
 
