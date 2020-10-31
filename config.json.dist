@@ -15,5 +15,10 @@
       "uri": "",
       "db": "basesvc"
     }
+  },
+  "newrelic": {
+      "id": "base-svc",
+      "key": "",
+      "debug": false
   }
 }
