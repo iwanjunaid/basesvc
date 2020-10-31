@@ -17,7 +17,7 @@ import (
 	_ "github.com/iwanjunaid/basesvc/docs"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
 	logInternal "github.com/iwanjunaid/basesvc/internal/logger"
-	telemetry "github.com/iwanjunaid/basesvc/internal/telemetry"
+	telemetry "github.com/iwanjunaid/basesvc/internal/newrelic"
 	"github.com/iwanjunaid/basesvc/registry"
 	logger "github.com/sirupsen/logrus"
 )
