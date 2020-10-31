@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/spf13/cobra"
 )
 

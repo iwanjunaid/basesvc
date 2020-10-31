@@ -5,7 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/iwanjunaid/basesvc/internal/logger"
+
+	"github.com/RoseRocket/xerrs"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -16,38 +17,29 @@ import (
 
 const authorsTable = "authors"
 
-type AuthorRepositoryWriterImpl struct {
+type AuthorRepositoryImpl struct {
 	db  *sql.DB
 	mdb *mongo.Database
+	kp  *kafka.Producer
 }
 
-func (author *AuthorRepositoryWriterImpl) InsertDocument(ctx context.Context) error {
-	panic("implement me")
-}
-
-func (author *AuthorRepositoryWriterImpl) Publish(ctx context.Context, topic string, message []byte) (err error) {
-	panic("implement me")
-}
-
-type Option func(impl *AuthorRepositoryWriterImpl)
-
-func NewAuthorRepositoryWriter(db *sql.DB, kp *kafka.Producer, mdb *mongo.Database) repository.AuthorRepository {
-	repo := &AuthorRepositoryWriterImpl{
+func NewAuthorRepository(db *sql.DB, kp *kafka.Producer, mdb *mongo.Database) repository.AuthorRepository {
+	repo := &AuthorRepositoryImpl{
 		db:  db,
 		mdb: mdb,
+		kp:  kp,
 	}
 
 	return repo
 }
 
-func (author *AuthorRepositoryWriterImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
+func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
 	query := fmt.Sprintf("SELECT id, name, email FROM %s", authorsTable)
 
 	rows, err := author.db.QueryContext(ctx, query)
 
 	if err != nil {
-		logger.WithFields(logger.Fields{"repository": "get authors"}).Errorf("%v", err)
-		return nil, err
+		return nil, xerrs.Mask(err, errors.New("error query"))
 	}
 
 	defer rows.Close()
@@ -64,8 +56,7 @@ func (author *AuthorRepositoryWriterImpl) FindAll(ctx context.Context) ([]*model
 		err := rows.Scan(&id, &name, &email)
 
 		if err != nil {
-			logger.WithFields(logger.Fields{"repository": "get authors"}).Errorf("%v", err)
-			return nil, err
+			return nil, xerrs.Mask(err, errors.New("error query"))
 		}
 
 		authors = append(authors, &model.Author{ID: uint(id.Int32), Name: name.String, Email: email.String})

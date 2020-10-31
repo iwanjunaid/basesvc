@@ -21,10 +21,6 @@ func (r *registry) NewAuthorRepository() repository.AuthorRepository {
 	return ar.NewAuthorRepository(r.db, r.kP, r.mdb)
 }
 
-func (r *registry) NewAuthorRepositoryWriter() repository.  {
-
-}
-
 func (r *registry) NewAuthorPresenter() presenter.AuthorPresenter {
 	return ap.NewAuthorPresenter()
 }

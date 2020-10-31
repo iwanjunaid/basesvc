@@ -19,6 +19,14 @@
 *.dll
 *.so
 *.dylib
+basesvc
+main
+/tmp/
+**/*.go
+
+### configuration files ###
+.env
+config.json
 bin/
 
 # Test binary, built with `go test -c`

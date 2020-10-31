@@ -34,3 +34,15 @@ func (r *registry) NewAppController() controller.AppController {
 		Author: r.NewAuthorController(),
 	}
 }
+
+func NewMongoConn(mdb *mongo.Database) Option {
+	return func(i *registry) {
+		i.mdb = mdb
+	}
+}
+
+func NewKafkaProducer(kp *kafka.Producer) Option {
+	return func(i *registry) {
+		i.kP = kp
+	}
+}

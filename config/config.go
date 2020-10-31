@@ -8,7 +8,6 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
 )
