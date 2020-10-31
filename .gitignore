@@ -19,9 +19,7 @@
 *.dll
 *.so
 *.dylib
-basesvc
 main
-/tmp/
 **/*.go
 
 ### configuration files ###
@@ -40,7 +38,6 @@ bin/
 
 ### Go Patch ###
 /vendor/
-/Godeps/
 
 ### Swagger Docs ###
 /docs
