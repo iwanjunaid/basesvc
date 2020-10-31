@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 
-	telemetry2 "github.com/iwanjunaid/basesvc/internal/telemetry"
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
 	newrelic "github.com/newrelic/go-agent"
 
@@ -53,7 +53,7 @@ func NewRest(port int, logg *logger.Logger, db *sql.DB, nra newrelic.Application
 	app.Use("/swagger", swagger.Handler)
 	app.Use(logInternal.RequestLogger(logg))
 
-	app.Use(adaptor.HTTPMiddleware(telemetry2.Middleware(nra, nil)))
+	app.Use(adaptor.HTTPMiddleware(telemetry.Middleware(nra, nil)))
 
 	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)
