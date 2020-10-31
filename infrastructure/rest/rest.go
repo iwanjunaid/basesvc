@@ -6,7 +6,10 @@ import (
 	"os"
 	"os/signal"
 
+	newrelic "github.com/newrelic/go-agent"
+
 	swagger "github.com/arsmn/fiber-swagger/v2"
+	"github.com/gofiber/adaptor/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -14,6 +17,7 @@ import (
 	_ "github.com/iwanjunaid/basesvc/docs"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
 	logInternal "github.com/iwanjunaid/basesvc/internal/logger"
+	telemetry "github.com/iwanjunaid/basesvc/internal/telemetry"
 	"github.com/iwanjunaid/basesvc/registry"
 	logger "github.com/sirupsen/logrus"
 )
@@ -40,13 +44,15 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port int, logg *logger.Logger, db *sql.DB) *RestImpl {
+func NewRest(port int, logg *logger.Logger, db *sql.DB, nra newrelic.Application) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
 	app.Use(recover.New())
 	app.Use("/swagger", swagger.Handler)
 	app.Use(logInternal.RequestLogger(logg))
+
+	app.Use(adaptor.HTTPMiddleware(telemetry.Middleware(nra, nil)))
 
 	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)
