@@ -23,6 +23,10 @@ type AuthorRepositoryImpl struct {
 	kp  *kafka.Producer
 }
 
+func (author *AuthorRepositoryImpl) InsertDocument(ctx context.Context) error {
+	panic("implement me")
+}
+
 func NewAuthorRepository(db *sql.DB, kp *kafka.Producer, mdb *mongo.Database) repository.AuthorRepository {
 	repo := &AuthorRepositoryImpl{
 		db:  db,
@@ -65,7 +69,7 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 	return authors, nil
 }
 
-func (author *AuthorRepositoryImpl) InsertDocument(ctx context.Context) error {
+func (author *AuthorRepositoryImpl) Insert(ctx context.Context) error {
 	panic("implement me")
 }
 

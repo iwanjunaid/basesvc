@@ -14,7 +14,7 @@ import (
 
 type AuthorController interface {
 	GetAuthors(c *fiber.Ctx) error
-	InsertAuthorDocument(author *model.Author) error
+	InsertAuthor(author *model.Author) error
 }
 
 type AuthorControllerImpl struct {
@@ -52,6 +52,6 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	return c.JSON(authors)
 }
 
-func (a *AuthorControllerImpl) InsertAuthorDocument(author *model.Author) error {
+func (a *AuthorControllerImpl) InsertAuthor(author *model.Author) error {
 	return nil
 }
