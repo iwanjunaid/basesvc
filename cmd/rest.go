@@ -13,6 +13,8 @@ var restCommand = &cobra.Command{
 		logger.WithField("component", "api_command").Infof("PreRun done")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
+		defer logger.WithField("component", "api_command").Println("Run done")
+
 		rest.NewRest(config.GetInt("rest.port"), logger, db).Serve()
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {

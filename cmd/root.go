@@ -13,6 +13,7 @@ var rootCommand = &cobra.Command{
 
 func Run() {
 	rootCommand.AddCommand(restCommand)
+	rootCommand.AddCommand(migratePqCmd)
 
 	if err := rootCommand.Execute(); err != nil {
 		logger.Panicf("%v", err)
