@@ -1,8 +1,14 @@
 package controller
 
 import (
+	"net/http"
+
+	"github.com/RoseRocket/xerrs"
 	"github.com/gofiber/fiber/v2"
+	"github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type AuthorController interface {
@@ -31,7 +37,14 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	authors, err := a.AuthorInteractor.GetAll(ctx)
 
 	if err != nil {
+		logger.LogEntrySetFields(c, log.Fields{
+			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
+			"context":     "GetAuthors",
+			"resp_status": http.StatusInternalServerError,
+		})
+		c.Status(500)
 		return err
+
 	}
 
 	return c.JSON(authors)

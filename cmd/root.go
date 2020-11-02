@@ -7,7 +7,7 @@ import (
 var rootCommand = &cobra.Command{
 	Use: "basesvc",
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Println("root command")
+		logger.Infof("root command")
 	},
 }
 
@@ -16,6 +16,6 @@ func Run() {
 	rootCommand.AddCommand(migratePqCmd)
 
 	if err := rootCommand.Execute(); err != nil {
-		logger.Panic(err)
+		logger.Panicf("%v", err)
 	}
 }

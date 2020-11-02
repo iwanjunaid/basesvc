@@ -8,7 +8,6 @@ import (
 	"github.com/cenkalti/backoff/v4"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-
 	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
 )
@@ -125,6 +124,10 @@ func Get(k string) interface{} {
 
 func GetString(k string) string {
 	return c.GetString(k)
+}
+
+func GetBool(k string) bool {
+	return c.GetBool(k)
 }
 
 func GetInt(k string) int {
