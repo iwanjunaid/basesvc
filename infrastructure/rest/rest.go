@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
+
 	newrelic "github.com/newrelic/go-agent"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
@@ -17,7 +19,6 @@ import (
 	_ "github.com/iwanjunaid/basesvc/docs"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
 	logInternal "github.com/iwanjunaid/basesvc/internal/logger"
-	telemetry "github.com/iwanjunaid/basesvc/internal/telemetry"
 	"github.com/iwanjunaid/basesvc/registry"
 	logger "github.com/sirupsen/logrus"
 )
