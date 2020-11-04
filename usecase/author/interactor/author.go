@@ -10,7 +10,6 @@ import (
 
 type AuthorInteractor interface {
 	GetAll(ctx context.Context) ([]*model.Author, error)
-	InsertDocument(ctx context.Context, author *model.Author) error
 }
 
 type AuthorInteractorImpl struct {
@@ -59,14 +58,8 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, error) {
 	authors, err := ai.AuthorSQLRepository.FindAll(ctx)
-
 	if err != nil {
 		return nil, err
 	}
-
 	return ai.AuthorPresenter.ResponseUsers(ctx, authors)
-}
-
-func (ai *AuthorInteractorImpl) InsertDocument(ctx context.Context, author *model.Author) (err error) {
-	return
 }
