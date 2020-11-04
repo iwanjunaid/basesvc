@@ -11,6 +11,9 @@ require (
 	github.com/confluentinc/confluent-kafka-go v1.4.2
 	github.com/evalphobia/logrus_sentry v0.8.2
 	github.com/getsentry/raven-go v0.2.0 // indirect
+	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/render v1.0.1
+	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofiber/fiber/v2 v2.1.3

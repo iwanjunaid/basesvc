@@ -3,6 +3,8 @@ package controller
 import (
 	"net/http"
 
+	"github.com/iwanjunaid/basesvc/internal/respond"
+
 	"github.com/RoseRocket/xerrs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/domain/model"
@@ -44,12 +46,10 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 			"context":     "GetAuthors",
 			"resp_status": http.StatusInternalServerError,
 		})
-		c.Status(500)
-		return err
+		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
 
 	}
-
-	return c.JSON(authors)
+	return respond.Success(c, http.StatusOK, authors)
 }
 
 func (a *AuthorControllerImpl) InsertAuthor(author *model.Author) error {
