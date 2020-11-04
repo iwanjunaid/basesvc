@@ -61,7 +61,7 @@ func (c *ConsumerImpl) Listen(topic string) {
 				if err := json.Unmarshal(e.Value, &author); err != nil {
 					panic(err)
 				}
-				c.appController.Author.InsertAuthorDocument(author)
+				c.appController.Author.InsertAuthor(author)
 			case kafka.PartitionEOF:
 				fmt.Printf("%% Reached %v\n", e)
 			case kafka.Error:

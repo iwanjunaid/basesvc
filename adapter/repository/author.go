@@ -73,12 +73,13 @@ func (author *AuthorRepositoryImpl) Insert(ctx context.Context) error {
 	panic("implement me")
 }
 
-func (author *AuthorRepositoryImpl) Publish(ctx context.Context, topic string, message []byte) (err error) {
+func (author *AuthorRepositoryImpl) Publish(ctx context.Context, topic string, message, key []byte) (err error) {
 	deliveryChan := make(chan kafka.Event)
 
 	err = author.kp.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          message,
+		Key:            key,
 	}, deliveryChan)
 
 	e := <-deliveryChan

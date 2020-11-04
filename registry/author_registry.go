@@ -3,7 +3,10 @@ package registry
 import (
 	"github.com/iwanjunaid/basesvc/adapter/controller"
 	ap "github.com/iwanjunaid/basesvc/adapter/presenter"
-	ar "github.com/iwanjunaid/basesvc/adapter/repository"
+	cr "github.com/iwanjunaid/basesvc/adapter/repository/cache"
+	dr "github.com/iwanjunaid/basesvc/adapter/repository/document"
+	er "github.com/iwanjunaid/basesvc/adapter/repository/event"
+	sr "github.com/iwanjunaid/basesvc/adapter/repository/sql"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
@@ -14,11 +17,27 @@ func (r *registry) NewAuthorController() controller.AuthorController {
 }
 
 func (r *registry) NewAuthorInteractor() interactor.AuthorInteractor {
-	return interactor.NewAuthorInteractor(r.NewAuthorRepository(), r.NewAuthorPresenter())
+	return interactor.NewAuthorInteractor(r.NewAuthorPresenter(),
+		interactor.AuthorSQLRepository(r.NewAuthorSQLRepository()),
+		interactor.AuthorDocumentRepository(r.NewAuthorDocumentRepository()),
+		interactor.AuthorCacheRepository(r.NewAuthorCacheRepository()),
+		interactor.AuthorEventRepository(r.NewEventRepository()))
 }
 
-func (r *registry) NewAuthorRepository() repository.AuthorRepository {
-	return ar.NewAuthorRepository(r.db, r.kP, r.mdb)
+func (r *registry) NewAuthorSQLRepository() repository.AuthorSQLRepository {
+	return sr.NewAuthorRepository(r.db)
+}
+
+func (r *registry) NewAuthorDocumentRepository() repository.AuthorDocumentRepository {
+	return dr.NewAuthorDocumentRepository(r.mdb)
+}
+
+func (r *registry) NewAuthorCacheRepository() repository.AuthorCacheRepository {
+	return cr.NewAuthorCacheRepository()
+}
+
+func (r *registry) NewEventRepository() repository.AuthorEventRepository {
+	return er.NewAuthorEventRepository(r.kP)
 }
 
 func (r *registry) NewAuthorPresenter() presenter.AuthorPresenter {

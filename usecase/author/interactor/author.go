@@ -14,18 +14,51 @@ type AuthorInteractor interface {
 }
 
 type AuthorInteractorImpl struct {
-	AuthorRepository repository.AuthorRepository
-	AuthorPresenter  presenter.AuthorPresenter
+	AuthorSQLRepository      repository.AuthorSQLRepository
+	AuthorDocumentRepository repository.AuthorDocumentRepository
+	AuthorCacheRepository    repository.AuthorCacheRepository
+	AuthorEventRepository    repository.AuthorEventRepository
+	AuthorPresenter          presenter.AuthorPresenter
 }
 
 type Option func(impl *AuthorInteractorImpl)
 
-func NewAuthorInteractor(r repository.AuthorRepository, p presenter.AuthorPresenter) AuthorInteractor {
-	return &AuthorInteractorImpl{r, p}
+func NewAuthorInteractor(p presenter.AuthorPresenter, option ...Option) AuthorInteractor {
+	interactor := &AuthorInteractorImpl{
+		AuthorPresenter: p,
+	}
+	for _, opt := range option {
+		opt(interactor)
+	}
+	return interactor
+}
+
+func AuthorSQLRepository(sql repository.AuthorSQLRepository) Option {
+	return func(impl *AuthorInteractorImpl) {
+		impl.AuthorSQLRepository = sql
+	}
+}
+
+func AuthorDocumentRepository(document repository.AuthorDocumentRepository) Option {
+	return func(impl *AuthorInteractorImpl) {
+		impl.AuthorSQLRepository = document
+	}
+}
+
+func AuthorCacheRepository(cache repository.AuthorCacheRepository) Option {
+	return func(impl *AuthorInteractorImpl) {
+		impl.AuthorCacheRepository = cache
+	}
+}
+
+func AuthorEventRepository(event repository.AuthorEventRepository) Option {
+	return func(impl *AuthorInteractorImpl) {
+		impl.AuthorEventRepository = event
+	}
 }
 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, error) {
-	authors, err := ai.AuthorRepository.FindAll(ctx)
+	authors, err := ai.AuthorSQLRepository.FindAll(ctx)
 
 	if err != nil {
 		return nil, err
