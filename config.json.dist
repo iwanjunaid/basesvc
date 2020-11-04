@@ -1,0 +1,35 @@
+{
+  "rest": {
+    "port": 8080
+  },
+  "migration": {
+    "postgres": {
+      "dir": "file://db/migrations/postgres",
+      "search_path": "public"
+    }
+  },
+  "database": {
+    "postgres": {
+      "user": "postgres",
+      "pass": "",
+      "host": "127.0.0.1",
+      "port": 5432,
+      "db": "postgres",
+      "ssl": {
+        "mode": "disable"
+      }
+    },
+    "mysql": {
+      "write": "user:password@tcp(host:port)/database_name"
+    },
+    "redis": {
+      "host": "localhost:6379",
+      "password": "",
+      "db": 1
+    },
+    "mongo": {
+      "uri": "",
+      "db": "basesvc"
+    }
+  }
+}
