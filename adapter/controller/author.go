@@ -64,11 +64,6 @@ func (a *AuthorControllerImpl) InsertAuthor(c *fiber.Ctx) error {
 	// Validate Author
 	err := ValidateAuthors(*author)
 	if err != nil {
-		logger.LogEntrySetFields(c, log.Fields{
-			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
-			"context":     "InsertAuthor",
-			"resp_status": http.StatusBadRequest,
-		})
 		return respond.Fail(c, http.StatusBadRequest, http.StatusInternalServerError, err)
 	}
 	authorResult, err := a.AuthorInteractor.Create(c.Context(), author)
