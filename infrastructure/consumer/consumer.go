@@ -7,6 +7,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/iwanjunaid/basesvc/config"
+
+	"go.mongodb.org/mongo-driver/mongo"
+
 	"github.com/jmoiron/sqlx"
 
 	"github.com/iwanjunaid/basesvc/adapter/controller"
@@ -18,22 +22,21 @@ import (
 
 type ConsumerImpl struct {
 	kc            *kafka.Consumer
-	appController controller.AppController
+	appController *controller.AppController
 }
 
-func NewConsumer(kc *kafka.Consumer, db *sqlx.DB) *ConsumerImpl {
-	registry := registry.NewRegistry(db)
+func NewConsumer(kc *kafka.Consumer, db *sqlx.DB, mdb *mongo.Database) *ConsumerImpl {
+	registry := registry.NewRegistry(db, registry.NewMongoConn(
+		mdb.Collection(config.GetString("database.mongo.collection"))))
 	appController := registry.NewAppController()
 
 	return &ConsumerImpl{
 		kc:            kc,
-		appController: appController,
+		appController: &appController,
 	}
 }
 
 func (c *ConsumerImpl) Listen(topic []string) {
-	//fmt.Println(c.kc.)
-	//fmt.Println(topic)
 	err := c.kc.SubscribeTopics(topic, nil)
 	if err != nil {
 		panic(err)
@@ -41,7 +44,6 @@ func (c *ConsumerImpl) Listen(topic []string) {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 	run := true
-	fmt.Println("blah")
 	for run == true {
 		select {
 		case sig := <-sigchan:
@@ -52,23 +54,17 @@ func (c *ConsumerImpl) Listen(topic []string) {
 			if ev == nil {
 				continue
 			}
-			c.kc.Events()
 			switch e := ev.(type) {
-			case kafka.AssignedPartitions:
-				fmt.Fprintf(os.Stderr, "%% %v\n", e)
-				c.kc.Assign(e.Partitions)
-			case kafka.RevokedPartitions:
-				fmt.Fprintf(os.Stderr, "%% %v\n", e)
-				c.kc.Unassign()
 			case *kafka.Message:
-				fmt.Println("test")
 				fmt.Printf("%% Message on %s:\n%s\n",
 					e.TopicPartition, string(e.Value))
 				var author *model.Author
 				if err := json.Unmarshal(e.Value, &author); err != nil {
-					fmt.Println("invalid")
+					fmt.Println(err.Error())
 				}
-				c.appController.Author.InsertAuthor(author)
+				if err := c.appController.Author.InsertDocument(author); err != nil {
+					fmt.Println(err.Error())
+				}
 			case kafka.PartitionEOF:
 				fmt.Printf("%% Reached %v\n", e)
 			case kafka.Error:
@@ -76,11 +72,6 @@ func (c *ConsumerImpl) Listen(topic []string) {
 				fmt.Fprintf(os.Stderr, "%% Error: %v\n", e)
 			}
 		}
-		//case ev := <-c.kc.Events():
-		//	fmt.Println("Test")
-		//
-		//
-		//}
 	}
 
 	fmt.Printf("Closing consumer\n")

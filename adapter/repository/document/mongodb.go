@@ -9,20 +9,25 @@ import (
 )
 
 type AuthorDocumentRepository struct {
-	mdb *mongo.Database
+	db *mongo.Collection
 }
 
-func (AuthorDocumentRepository) FindAll(ctx context.Context) ([]*model.Author, error) {
+func (aD *AuthorDocumentRepository) FindAll(ctx context.Context) ([]*model.Author, error) {
 	panic("implement me")
 }
 
-func (AuthorDocumentRepository) Create(ctx context.Context) error {
-	panic("implement me")
+func (aD *AuthorDocumentRepository) Create(ctx context.Context, author *model.Author) error {
+	_, err := aD.db.InsertOne(ctx, author)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func NewAuthorDocumentRepository(mdb *mongo.Database) repository.AuthorDocumentRepository {
+func NewAuthorDocumentRepository(mdb *mongo.Collection) repository.AuthorDocumentRepository {
 	impl := &AuthorDocumentRepository{
-		mdb: mdb,
+		db: mdb,
 	}
 	return impl
 }

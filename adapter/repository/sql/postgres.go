@@ -12,6 +12,7 @@ import (
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
+	uuid "github.com/satori/go.uuid"
 )
 
 const authorsTable = "authors"
@@ -25,11 +26,14 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 }
 
 func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Author) (*model.Author, error) {
+	id := uuid.NewV4()
+
 	query := fmt.Sprintf(`INSERT INTO %s 
-	(name, email, created_at, updated_at, deleted_at) 
+	(id, name, email, created_at, updated_at) 
 	VALUES
-	(:name, :email, :created_at, :updated_at)`, authorsTable)
+	(:id, :name, :email, :created_at, :updated_at)`, authorsTable)
 	params := map[string]interface{}{
+		"id":         id,
 		"name":       author.Name,
 		"email":      author.Email,
 		"created_at": time.Now(),

@@ -11,7 +11,7 @@ import (
 
 type registry struct {
 	db  *sqlx.DB
-	mdb *mongo.Database
+	mdb *mongo.Collection
 	kP  *kafka.Producer
 }
 
@@ -35,7 +35,7 @@ func (r *registry) NewAppController() controller.AppController {
 	}
 }
 
-func NewMongoConn(mdb *mongo.Database) Option {
+func NewMongoConn(mdb *mongo.Collection) Option {
 	return func(i *registry) {
 		i.mdb = mdb
 	}

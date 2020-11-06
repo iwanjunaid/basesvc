@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/iwanjunaid/basesvc/internal/respond"
@@ -16,7 +17,8 @@ import (
 
 type AuthorController interface {
 	GetAuthors(c *fiber.Ctx) error
-	InsertAuthor(author *model.Author) error
+	InsertAuthor(c *fiber.Ctx) error
+	InsertDocument(author *model.Author) error
 }
 
 type AuthorControllerImpl struct {
@@ -52,10 +54,28 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	return respond.Success(c, http.StatusOK, authors)
 }
 
-func (a *AuthorControllerImpl) InsertAuthor(author *model.Author) error {
-	return nil
+func (a *AuthorControllerImpl) InsertAuthor(c *fiber.Ctx) error {
+	var author *model.Author
+	if err := c.BodyParser(&author); err != nil {
+		return err
+	}
+	authorResult, err := a.AuthorInteractor.Create(c.Context(), author)
+	if err != nil {
+		logger.LogEntrySetFields(c, log.Fields{
+			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
+			"context":     "InsertAuthor",
+			"resp_status": http.StatusInternalServerError,
+		})
+		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
+
+	}
+	return respond.Success(c, http.StatusOK, authorResult)
 }
 
-func (a *AuthorControllerImpl) InsertAuthorDocument(author *model.Author) error {
-
+func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
+	err := a.AuthorInteractor.CreateDocument(context.Background(), author)
+	if err != nil {
+		return err
+	}
+	return nil
 }

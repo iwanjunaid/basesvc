@@ -13,7 +13,7 @@ type AuthorSQLRepository interface {
 
 type AuthorDocumentRepository interface {
 	FindAll(ctx context.Context) ([]*model.Author, error)
-	Create(ctx context.Context) error
+	Create(ctx context.Context, author *model.Author) error
 }
 
 type AuthorCacheRepository interface {

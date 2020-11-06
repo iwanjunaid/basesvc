@@ -42,7 +42,7 @@ func AuthorSQLRepository(sql repository.AuthorSQLRepository) Option {
 
 func AuthorDocumentRepository(document repository.AuthorDocumentRepository) Option {
 	return func(impl *AuthorInteractorImpl) {
-		impl.AuthorSQLRepository = document
+		impl.AuthorDocumentRepository = document
 	}
 }
 
@@ -67,9 +67,18 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, er
 }
 
 func (ai *AuthorInteractorImpl) CreateDocument(ctx context.Context, author *model.Author) error {
-	panic("implement me")
+	err := ai.AuthorDocumentRepository.Create(ctx, author)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ai *AuthorInteractorImpl) Create(ctx context.Context, author *model.Author) (*model.Author, error) {
-	panic("implement me")
+	var err error
+	author, err = ai.AuthorSQLRepository.Create(ctx, author)
+	if err != nil {
+		return author, err
+	}
+	return author, err
 }

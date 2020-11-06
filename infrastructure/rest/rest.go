@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/iwanjunaid/basesvc/config"
+
 	"github.com/jmoiron/sqlx"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -61,7 +63,7 @@ func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp
 		_ = app.Shutdown()
 	}()
 
-	registry := registry.NewRegistry(db, registry.NewMongoConn(mdb), registry.NewKafkaProducer(kp))
+	registry := registry.NewRegistry(db, registry.NewMongoConn(mdb.Collection(config.GetString("database.collection"))), registry.NewKafkaProducer(kp))
 	appController := registry.NewAppController()
 
 	r := &RestImpl{
