@@ -62,7 +62,7 @@ func (a *AuthorControllerImpl) InsertAuthor(c *fiber.Ctx) error {
 		return err
 	}
 	// Validate Author
-	err := ValidateAuthors(author)
+	err := ValidateAuthors(*author)
 	if err != nil {
 		logger.LogEntrySetFields(c, log.Fields{
 			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
@@ -93,7 +93,7 @@ func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
 }
 
 // ValidateAuthors validates Author struct
-func ValidateAuthors(author *model.Author) error {
+func ValidateAuthors(author model.Author) error {
 	var err error
 
 	err = validation.ValidateStruct(&author,
