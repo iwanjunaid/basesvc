@@ -3,6 +3,8 @@ package cmd
 import (
 	"database/sql"
 
+	"github.com/fsnotify/fsnotify"
+
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/iwanjunaid/basesvc/config"
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
@@ -22,7 +24,16 @@ var (
 )
 
 func init() {
-	config.Configure()
+	c := config.Configure()
+
+	// hot reload on config change...
+	go func() {
+		c.WatchConfig()
+		c.OnConfigChange(func(e fsnotify.Event) {
+			log.Printf("config file changed %v", e.Name)
+		})
+	}()
+
 	db = InitDB()
 	logger = InitLogger()
 }
