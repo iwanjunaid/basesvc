@@ -10,6 +10,7 @@ import (
 
 type AuthorInteractor interface {
 	GetAll(ctx context.Context) ([]*model.Author, error)
+	Create(ctx context.Context) ([]*model.Author, error)
 }
 
 type AuthorInteractorImpl struct {
@@ -62,4 +63,8 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, er
 		return nil, err
 	}
 	return ai.AuthorPresenter.ResponseUsers(ctx, authors)
+}
+
+func (ai *AuthorInteractorImpl) Create(ctx context.Context) ([]*model.Author, error) {
+	panic("implement me")
 }

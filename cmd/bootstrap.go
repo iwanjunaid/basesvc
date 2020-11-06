@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"database/sql"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -9,13 +9,14 @@ import (
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/iwanjunaid/basesvc/config"
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
+	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
 	CfgMySql      = "database.mysql"
 	CfgRedis      = "database.redis"
-	CfgKafkaGroup = "kafka.groupID"
+	CfgKafkaGroup = "kafka.group_id"
 	CfgKafkaHost  = "kafka.host"
 	CfgKafkaTopic = "kafka.topic"
 	CfgMongoURI   = "database.mongo.uri"
@@ -25,7 +26,7 @@ const (
 
 var (
 	logger *log.Logger
-	db     *sql.DB
+	db     *sqlx.DB
 	kc     *kafka.Consumer
 	kp     *kafka.Producer
 	mdb    *mongo.Database
@@ -33,15 +34,19 @@ var (
 
 func init() {
 	config.Configure()
-	db = InitDB()
+	db = InitPostgresDB()
 	logger = InitLogger()
 	kc = InitKafkaConsumer()
 	kp = InitKafkaProducer()
 	mdb = InitMongoConnect()
 }
 
-func InitDB() (db *sql.DB) {
-	db = datastore.NewDB("mysql", config.GetString(CfgMySql))
+func InitPostgresDB() (db *sqlx.DB) {
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		config.GetString("database.postgres.write.host"), config.GetInt("database.postgres.write.port"),
+		config.GetString("database.postgres.write.user"), config.GetString("database.postgres.write.pass"),
+		config.GetString("database.postgres.write.db"), config.GetString("database.postgres.write.sslmode"))
+	db = datastore.PostgresConn(dsn)
 	return
 }
 

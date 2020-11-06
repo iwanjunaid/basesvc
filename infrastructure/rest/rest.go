@@ -1,10 +1,11 @@
 package rest
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"os/signal"
+
+	"github.com/jmoiron/sqlx"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -23,7 +24,7 @@ import (
 
 type RestImpl struct {
 	port          int
-	db            *sql.DB
+	db            *sqlx.DB
 	router        *fiber.App
 	appController *controller.AppController
 	log           *logger.Logger
@@ -43,7 +44,7 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port int, logg *logger.Logger, db *sql.DB, mdb *mongo.Database, kp *kafka.Producer) *RestImpl {
+func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())

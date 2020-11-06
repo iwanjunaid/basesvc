@@ -1,12 +1,13 @@
 package consumer
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 
@@ -21,7 +22,7 @@ type ConsumerImpl struct {
 	appController controller.AppController
 }
 
-func NewConsumer(kc *kafka.Consumer, db *sql.DB) *ConsumerImpl {
+func NewConsumer(kc *kafka.Consumer, db *sqlx.DB) *ConsumerImpl {
 	registry := registry.NewRegistry(db)
 	appController := registry.NewAppController()
 
@@ -31,8 +32,8 @@ func NewConsumer(kc *kafka.Consumer, db *sql.DB) *ConsumerImpl {
 	}
 }
 
-func (c *ConsumerImpl) Listen(topic string) {
-	err := c.kc.Subscribe(topic, nil)
+func (c *ConsumerImpl) Listen(topic []string) {
+	err := c.kc.SubscribeTopics(topic, nil)
 	if err != nil {
 		panic(err)
 	}

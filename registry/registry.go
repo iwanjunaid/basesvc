@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
@@ -10,7 +10,7 @@ import (
 )
 
 type registry struct {
-	db  *sql.DB
+	db  *sqlx.DB
 	mdb *mongo.Database
 	kP  *kafka.Producer
 }
@@ -21,7 +21,7 @@ type Registry interface {
 
 type Option func(*registry)
 
-func NewRegistry(db *sql.DB, option ...Option) Registry {
+func NewRegistry(db *sqlx.DB, option ...Option) Registry {
 	r := &registry{db: db}
 	for _, o := range option {
 		o(r)

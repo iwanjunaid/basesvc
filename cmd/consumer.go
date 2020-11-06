@@ -13,7 +13,7 @@ var consumerCommand = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		defer logger.WithField("component", "consumer_command").Println("Run done")
-		consumer.NewConsumer(kc, db).Listen(config.GetString("kafka.topic"))
+		consumer.NewConsumer(kc, db).Listen(config.GetStringSlice("kafka.topic"))
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 		defer db.Close()
