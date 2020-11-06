@@ -9,9 +9,8 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/iwanjunaid/basesvc/domain/model"
-
 	"github.com/iwanjunaid/basesvc/adapter/controller"
+	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/registry"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -33,6 +32,8 @@ func NewConsumer(kc *kafka.Consumer, db *sqlx.DB) *ConsumerImpl {
 }
 
 func (c *ConsumerImpl) Listen(topic []string) {
+	//fmt.Println(c.kc.)
+	//fmt.Println(topic)
 	err := c.kc.SubscribeTopics(topic, nil)
 	if err != nil {
 		panic(err)
@@ -40,14 +41,18 @@ func (c *ConsumerImpl) Listen(topic []string) {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 	run := true
-
+	fmt.Println("blah")
 	for run == true {
 		select {
 		case sig := <-sigchan:
 			fmt.Printf("Caught signal %v: terminating\n", sig)
 			run = false
-
-		case ev := <-c.kc.Events():
+		default:
+			ev := c.kc.Poll(100)
+			if ev == nil {
+				continue
+			}
+			c.kc.Events()
 			switch e := ev.(type) {
 			case kafka.AssignedPartitions:
 				fmt.Fprintf(os.Stderr, "%% %v\n", e)
@@ -56,11 +61,12 @@ func (c *ConsumerImpl) Listen(topic []string) {
 				fmt.Fprintf(os.Stderr, "%% %v\n", e)
 				c.kc.Unassign()
 			case *kafka.Message:
+				fmt.Println("test")
 				fmt.Printf("%% Message on %s:\n%s\n",
 					e.TopicPartition, string(e.Value))
 				var author *model.Author
 				if err := json.Unmarshal(e.Value, &author); err != nil {
-					panic(err)
+					fmt.Println("invalid")
 				}
 				c.appController.Author.InsertAuthor(author)
 			case kafka.PartitionEOF:
@@ -70,6 +76,11 @@ func (c *ConsumerImpl) Listen(topic []string) {
 				fmt.Fprintf(os.Stderr, "%% Error: %v\n", e)
 			}
 		}
+		//case ev := <-c.kc.Events():
+		//	fmt.Println("Test")
+		//
+		//
+		//}
 	}
 
 	fmt.Printf("Closing consumer\n")

@@ -2,6 +2,11 @@ package sql
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"time"
+
+	"github.com/RoseRocket/xerrs"
 
 	"github.com/jmoiron/sqlx"
 
@@ -15,12 +20,27 @@ type AuthorSQLRepositoryImpl struct {
 	db *sqlx.DB
 }
 
-func (AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
+func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
 	panic("implement me")
 }
 
-func (AuthorSQLRepositoryImpl) Create(ctx context.Context) error {
-	panic("implement me")
+func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Author) (*model.Author, error) {
+	query := fmt.Sprintf(`INSERT INTO %s 
+	(name, email, created_at, updated_at, deleted_at) 
+	VALUES
+	(:name, :email, :created_at, :updated_at)`, authorsTable)
+	params := map[string]interface{}{
+		"name":       author.Name,
+		"email":      author.Email,
+		"created_at": time.Now(),
+		"updated_at": time.Now(),
+	}
+	_, err := as.db.NamedExecContext(ctx, query, params)
+	if err != nil {
+		err = xerrs.Mask(err, errors.New("error query insert"))
+		return author, err
+	}
+	return author, nil
 }
 
 func NewAuthorRepository(db *sqlx.DB) repository.AuthorSQLRepository {

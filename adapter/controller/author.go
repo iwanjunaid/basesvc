@@ -55,3 +55,7 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 func (a *AuthorControllerImpl) InsertAuthor(author *model.Author) error {
 	return nil
 }
+
+func (a *AuthorControllerImpl) InsertAuthorDocument(author *model.Author) error {
+
+}

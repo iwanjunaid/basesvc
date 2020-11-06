@@ -8,7 +8,7 @@ import (
 
 type AuthorSQLRepository interface {
 	FindAll(ctx context.Context) ([]*model.Author, error)
-	Create(ctx context.Context) error
+	Create(ctx context.Context, author *model.Author) (*model.Author, error)
 }
 
 type AuthorDocumentRepository interface {

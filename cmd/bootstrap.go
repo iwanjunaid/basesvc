@@ -18,7 +18,7 @@ const (
 	CfgRedis      = "database.redis"
 	CfgKafkaGroup = "kafka.group_id"
 	CfgKafkaHost  = "kafka.host"
-	CfgKafkaTopic = "kafka.topic"
+	CfgKafkaTopic = "kafka.topics"
 	CfgMongoURI   = "database.mongo.uri"
 	CfgMongoDB    = "database.mongo.db"
 	CfgSentryKey  = "sentry.key"
