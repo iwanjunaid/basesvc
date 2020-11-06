@@ -27,11 +27,7 @@ func (author *AuthorEventRepositoryImpl) Publish(ctx context.Context, topic stri
 	m := e.(*kafka.Message)
 	if m.TopicPartition.Error != nil {
 		return errors.New(fmt.Sprintf("Delivery failed: %v\n", m.TopicPartition.Error))
-	} else {
-		return errors.New(fmt.Sprintf("Delivered message to topic %s [%d] at offset %v\n",
-			*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset))
 	}
-
 	close(deliveryChan)
 	return
 }
