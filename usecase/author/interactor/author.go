@@ -10,6 +10,7 @@ import (
 
 type AuthorInteractor interface {
 	GetAll(ctx context.Context) ([]*model.Author, error)
+	Create(ctx context.Context, entry *model.Author) error
 }
 
 type AuthorInteractorImpl struct {
@@ -29,4 +30,15 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, er
 	}
 
 	return ai.AuthorPresenter.ResponseUsers(ctx, authors)
+}
+
+// Create new author
+func (ai *AuthorInteractorImpl) Create(ctx context.Context, entry *model.Author) error {
+	err := ai.AuthorRepository.Create(ctx, entry)
+
+	if err != nil {
+		return err
+	}
+
+	return ai.AuthorPresenter.ResponseUser(ctx, entry)
 }

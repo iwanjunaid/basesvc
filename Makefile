@@ -47,11 +47,11 @@ docker:
 
 run-dev:
 	@echo "> Run docker-compose [DEV]"
-	@docker-compose -f deployments/docker-compose.dev.yml up --build -d
+	@docker-compose -f deployments/docker-compose.dev.yml -f deployments/docker-compose.postgre.yml up -d
 
 run-prod:
 	@echo "> Run docker [PRODUCTION]"
-	@docker-compose -f deployments/docker-compose.yml up --build -d
+	@docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.postgre.yml up --build -d
 
 setup:
 	@if ! [ -f ".env" ]; then cp .env.dist .env ; fi
@@ -59,6 +59,6 @@ setup:
 
 stop:
 	@echo "> Stop docker-compose"
-	@docker-compose -f deployments/docker-compose.yml down
+	@docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.postgre.yml down
 
 .PHONY: clean install unittest lint-prepare lint docs engine dev prod test setup dependencies run-dev run-prod stop

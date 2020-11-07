@@ -41,6 +41,7 @@ type RestImpl struct {
 // @host localhost:8080
 // @BasePath /v1
 func NewRest(port int, logg *logger.Logger, db *sql.DB) *RestImpl {
+	logg.Infof("port :%d", port)
 	app := fiber.New()
 
 	app.Use(cors.New())

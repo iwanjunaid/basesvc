@@ -56,3 +56,26 @@ func (author *AuthorRepositoryImpl) FindAll(ctx context.Context) ([]*model.Autho
 
 	return authors, nil
 }
+
+func (author *AuthorRepositoryImpl) Create(ctx context.Context, entry *model.Author) (err error) {
+	q := fmt.Sprintf("INSERT %s SET Name=$1, Email=$2, CreatedAt=$3, UpdatedAt=$4", authorsTable)
+
+	stmt, err := author.db.PrepareContext(ctx, q)
+	if err != nil {
+		return
+	}
+
+	res, err := stmt.ExecContext(ctx, entry.Name, entry.Email, entry.CreatedAt, entry.UpdatedAt)
+	if err != nil {
+		return
+	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		return
+	}
+
+	entry.ID = uint(lastID)
+	return
+
+}

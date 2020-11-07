@@ -13,7 +13,8 @@ import (
 
 const (
 	CfgMySql     = "database.mysql"
-	CfgMongoDB   = "database.mysql"
+	CfgPostgres  = "database.postgres"
+	CfgMongoDB   = "database.mongo"
 	CfgRedis     = "database.redis"
 	CfgSentryKey = "sentry.key"
 )
@@ -39,7 +40,8 @@ func init() {
 }
 
 func InitDB() (db *sql.DB) {
-	db = datastore.NewDB("mysql", config.GetString(CfgMySql))
+	// db = datastore.NewDB("mysql", config.GetString(CfgMySql))
+	db = datastore.NewDB("postgres", config.GetString(CfgPostgres))
 	return
 }
 

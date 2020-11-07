@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/RoseRocket/xerrs"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/internal/logger"
@@ -16,6 +14,7 @@ import (
 
 type AuthorController interface {
 	GetAuthors(c *fiber.Ctx) error
+	CreateAuthor(c *fiber.Ctx, a *model.Author) error
 }
 
 type AuthorControllerImpl struct {
@@ -50,12 +49,29 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 
 	}
 
-	// Validate Authors
-	err = ValidateAuthors(authors)
+	c.JSON(authors)
+	return nil
+
+}
+
+// CreateAuthor godoc
+// @Summary Create a new author
+// @Description create a new author
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param author body model.Author true "author"
+// @Success 200
+// @Router /authors [post]
+func (a *AuthorControllerImpl) CreateAuthor(c *fiber.Ctx, author *model.Author) error {
+	ctx := c.Context()
+
+	err := a.AuthorInteractor.Create(ctx, author)
+
 	if err != nil {
 		logger.LogEntrySetFields(c, log.Fields{
 			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
-			"context":     "GetAuthors",
+			"context":     "CreateAuthor",
 			"resp_status": http.StatusInternalServerError,
 		})
 		c.Status(500)
@@ -63,21 +79,8 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 
 	}
 
-	c.JSON(authors)
+	c.JSON(author)
+
 	return nil
 
-}
-
-// ValidateAuthors validates Author struct
-func ValidateAuthors(authors []*model.Author) error {
-	var err error
-	for _, a := range authors {
-		if err = validation.ValidateStruct(&a,
-			validation.Field(&a.ID, validation.Required),
-			validation.Field(&a.Name, validation.Required),
-			validation.Field(&a.Email, validation.Required, is.Email),
-		); err != nil {
-		}
-	}
-	return err
 }
