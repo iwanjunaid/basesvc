@@ -13,7 +13,7 @@ var restCommand = &cobra.Command{
 		logger.WithField("component", "api_command").Infof("PreRun done")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		rest.NewRest(config.GetInt("rest.port"), logger, db, telemetry).Serve()
+		rest.NewRest(config.GetInt("rest.port"), logger, db, mdb, kp, telemetry).Serve()
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 		defer db.Close()

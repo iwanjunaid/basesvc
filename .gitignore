@@ -1,3 +1,9 @@
+# Created by https://www.toptal.com/developers/gitignore/api/go,code
+# Edit at https://www.toptal.com/developers/gitignore?templates=go,code
+
+### Configuration ###
+.env
+
 ### Code ###
 .vscode/*
 !.vscode/settings.json
@@ -9,16 +15,35 @@
 ### Goland ###
 .idea
 
-
-vendor
-
-### configuration files ###
-config.json
-.env
-
 ### Go ###
 # Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+basesvc
 main
+/tmp/
+
+### configuration files ###
+.env
+config.json
+bin/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+### Go Patch ###
+/vendor/
 
 ### Swagger Docs ###
-docs
+/docs
+
+# End of https://www.toptal.com/developers/gitignore/api/go,code

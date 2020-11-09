@@ -28,6 +28,14 @@ lint-prepare:
 lint:
 	./bin/golangci-lint run ./...
  
+migrate-up:
+	@echo "> Migrate up database"
+	@go run main.go migratepq up
+
+migrate-down:
+	@echo "> Migrate down database"
+	@go run main.go migratepq down
+
 docs:
 	@echo "> Generate Swagger Docs"
 	@if ! command -v swag &> /dev/null; then go install github.com/swaggo/swag/cmd/swag ; fi
