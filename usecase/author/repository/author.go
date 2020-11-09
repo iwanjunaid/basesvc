@@ -6,7 +6,21 @@ import (
 	"github.com/iwanjunaid/basesvc/domain/model"
 )
 
-// AuthorRepository :
-type AuthorRepository interface {
+type AuthorSQLRepository interface {
 	FindAll(ctx context.Context) ([]*model.Author, error)
+	Create(ctx context.Context, author *model.Author) (*model.Author, error)
+}
+
+type AuthorDocumentRepository interface {
+	FindAll(ctx context.Context) ([]*model.Author, error)
+	Create(ctx context.Context, author *model.Author) error
+}
+
+type AuthorCacheRepository interface {
+	Find(ctx context.Context) ([]*model.Author, error)
+	Create(ctx context.Context) error
+}
+
+type AuthorEventRepository interface {
+	Publish(ctx context.Context, topic string, key, message []byte) (err error)
 }

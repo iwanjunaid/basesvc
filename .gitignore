@@ -25,7 +25,6 @@
 basesvc
 main
 /tmp/
-**/*.go
 
 ### configuration files ###
 .env
