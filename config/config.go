@@ -39,9 +39,6 @@ var (
 	c    *viper.Viper
 	dirs = []string{
 		".",
-		"$HOME",
-		"/usr/local/etc",
-		"/etc",
 	}
 
 	errEnv, errFile, errConsul error

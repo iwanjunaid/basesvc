@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"context"
 	"net/http"
+
+	"github.com/iwanjunaid/basesvc/internal/respond"
 
 	"github.com/RoseRocket/xerrs"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -16,6 +19,8 @@ import (
 
 type AuthorController interface {
 	GetAuthors(c *fiber.Ctx) error
+	InsertAuthor(c *fiber.Ctx) error
+	InsertDocument(author *model.Author) error
 }
 
 type AuthorControllerImpl struct {
@@ -45,39 +50,50 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 			"context":     "GetAuthors",
 			"resp_status": http.StatusInternalServerError,
 		})
-		c.Status(500)
-		return err
+		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
 
 	}
+	return respond.Success(c, http.StatusOK, authors)
+}
 
-	// Validate Authors
-	err = ValidateAuthors(authors)
+func (a *AuthorControllerImpl) InsertAuthor(c *fiber.Ctx) error {
+	var author *model.Author
+	if err := c.BodyParser(&author); err != nil {
+		return err
+	}
+	// Validate Author
+	err := ValidateAuthors(*author)
+	if err != nil {
+		return respond.Fail(c, http.StatusBadRequest, http.StatusInternalServerError, err)
+	}
+	authorResult, err := a.AuthorInteractor.Create(c.Context(), author)
 	if err != nil {
 		logger.LogEntrySetFields(c, log.Fields{
 			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
-			"context":     "GetAuthors",
+			"context":     "InsertAuthor",
 			"resp_status": http.StatusInternalServerError,
 		})
-		c.Status(500)
-		return err
+		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
 
 	}
+	return respond.Success(c, http.StatusOK, authorResult)
+}
 
-	c.JSON(authors)
+func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
+	err := a.AuthorInteractor.CreateDocument(context.Background(), author)
+	if err != nil {
+		return err
+	}
 	return nil
-
 }
 
 // ValidateAuthors validates Author struct
-func ValidateAuthors(authors []*model.Author) error {
+func ValidateAuthors(author model.Author) error {
 	var err error
-	for _, a := range authors {
-		if err = validation.ValidateStruct(&a,
-			validation.Field(&a.ID, validation.Required),
-			validation.Field(&a.Name, validation.Required),
-			validation.Field(&a.Email, validation.Required, is.Email),
-		); err != nil {
-		}
-	}
+
+	err = validation.ValidateStruct(&author,
+		validation.Field(&author.Name, validation.Required),
+		validation.Field(&author.Email, validation.Required, is.Email),
+	)
 	return err
 }

@@ -1,25 +1,48 @@
 package registry
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 
+	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/iwanjunaid/basesvc/adapter/controller"
 )
 
 type registry struct {
-	db *sql.DB
+	db  *sqlx.DB
+	mdb *mongo.Collection
+	kP  *kafka.Producer
 }
 
 type Registry interface {
 	NewAppController() controller.AppController
 }
 
-func NewRegistry(db *sql.DB) Registry {
-	return &registry{db}
+type Option func(*registry)
+
+func NewRegistry(db *sqlx.DB, option ...Option) Registry {
+	r := &registry{db: db}
+	for _, o := range option {
+		o(r)
+	}
+	return r
 }
 
 func (r *registry) NewAppController() controller.AppController {
 	return controller.AppController{
 		Author: r.NewAuthorController(),
+	}
+}
+
+func NewMongoConn(mdb *mongo.Collection) Option {
+	return func(i *registry) {
+		i.mdb = mdb
+	}
+}
+
+func NewKafkaProducer(kp *kafka.Producer) Option {
+	return func(i *registry) {
+		i.kP = kp
 	}
 }
