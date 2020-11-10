@@ -5,33 +5,41 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 
+	newrelic "github.com/newrelic/go-agent"
+	"github.com/pkg/errors"
+
+	"github.com/evalphobia/logrus_sentry"
+	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
+	"github.com/newrelic/go-agent/_integrations/nrlogrus"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
-	"github.com/evalphobia/logrus_sentry"
 	"github.com/iwanjunaid/basesvc/config"
-	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 )
 
-const (
-	CfgMySql      = "database.mysql"
-	CfgRedis      = "database.redis"
-	CfgKafkaGroup = "kafka.group_id"
-	CfgKafkaHost  = "kafka.host"
-	CfgKafkaTopic = "kafka.topics"
-	CfgMongoURI   = "database.mongo.uri"
-	CfgMongoDB    = "database.mongo.db"
-	CfgSentryKey  = "sentry.key"
+var (
+	CfgMySql         = "database.mysql"
+	CfgRedis         = "database.redis"
+	CfgKafkaGroup    = "kafka.group_id"
+	CfgKafkaHost     = "kafka.host"
+	CfgKafkaTopic    = "kafka.topics"
+	CfgNewRelicKey   = "newrelic.key"
+	CfgNewRelicDebug = "newrelic.debug"
+	CfgMongoURI      = "database.mongo.uri"
+	CfgMongoDB       = "database.mongo.db"
+	CfgSentryKey     = "sentry.key"
+	TelemetryID      = "newrelic.id"
 )
 
 var (
-	logger *log.Logger
-	db     *sqlx.DB
-	kc     *kafka.Consumer
-	kp     *kafka.Producer
-	mdb    *mongo.Database
+	logger    *log.Logger
+	db        *sqlx.DB
+	kc        *kafka.Consumer
+	kp        *kafka.Producer
+	mdb       *mongo.Database
+	telemetry newrelic.Application
 )
 
 func init() {
@@ -47,6 +55,7 @@ func init() {
 
 	db = InitPostgresDB()
 	logger = InitLogger()
+	telemetry = NewTelemetry(logger)
 	kc = InitKafkaConsumer()
 	kp = InitKafkaProducer()
 	mdb = InitMongoConnect()
@@ -76,6 +85,26 @@ func InitLogger() *log.Logger {
 		}
 	}
 	return l
+}
+
+func NewTelemetry(l *log.Logger) newrelic.Application {
+	key := config.GetString(CfgNewRelicKey)
+	e := l.WithField("component", "newrelic")
+	if len(key) == 0 {
+		e.Warnf("configuration %s is not defined", CfgNewRelicKey)
+		return nil
+	}
+	conf := newrelic.NewConfig(config.GetString(TelemetryID), key)
+	conf.Logger = nrlogrus.StandardLogger()
+	if isDebug := config.GetBool(CfgNewRelicDebug); isDebug {
+		l.SetLevel(log.DebugLevel)
+	}
+	app, err := newrelic.NewApplication(conf)
+	if err != nil {
+		e.Info(errors.Cause(err))
+		return nil
+	}
+	return app
 }
 
 func InitKafkaConsumer() *kafka.Consumer {
