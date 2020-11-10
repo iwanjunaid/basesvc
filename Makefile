@@ -3,7 +3,7 @@ test:
 	go test -v -cover -covermode=atomic ./...
 
 engine:
-	go build CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o ${BINARY}
+	go build CGO_ENABLED=0 GOOS=linux go build -a -tags musl -installsuffix cgo -ldflags '-extldflags "-static"' -o ${BINARY}
 
 dev: setup run-dev
 
@@ -47,7 +47,7 @@ docker:
 
 run-dev:
 	@echo "> Run docker-compose [DEV]"
-	@docker-compose -f deployments/docker-compose.dev.yml -f deployments/docker-compose.postgre.yml up -d
+	@docker-compose -f deployments/docker-compose.dev.yml -f deployments/docker-compose.postgre.yml up --build -d
 
 run-prod:
 	@echo "> Run docker [PRODUCTION]"
