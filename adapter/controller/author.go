@@ -1,7 +1,12 @@
 package controller
 
 import (
+	"context"
 	"net/http"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+	"github.com/iwanjunaid/basesvc/internal/respond"
 
 	"github.com/RoseRocket/xerrs"
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +19,8 @@ import (
 
 type AuthorController interface {
 	GetAuthors(c *fiber.Ctx) error
-	CreateAuthor(c *fiber.Ctx, a *model.Author) error
+	InsertAuthor(c *fiber.Ctx) error
+	InsertDocument(author *model.Author) error
 }
 
 type AuthorControllerImpl struct {
@@ -44,43 +50,50 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 			"context":     "GetAuthors",
 			"resp_status": http.StatusInternalServerError,
 		})
-		c.Status(500)
-		return err
+		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
 
 	}
-
-	c.JSON(authors)
-	return nil
-
+	return respond.Success(c, http.StatusOK, authors)
 }
 
-// CreateAuthor godoc
-// @Summary Create a new author
-// @Description create a new author
-// @Tags authors
-// @Accept json
-// @Produce json
-// @Param author body model.Author true "author"
-// @Success 200
-// @Router /authors [post]
-func (a *AuthorControllerImpl) CreateAuthor(c *fiber.Ctx, author *model.Author) error {
-	ctx := c.Context()
-
-	err := a.AuthorInteractor.Create(ctx, author)
-
+func (a *AuthorControllerImpl) InsertAuthor(c *fiber.Ctx) error {
+	var author *model.Author
+	if err := c.BodyParser(&author); err != nil {
+		return err
+	}
+	// Validate Author
+	err := ValidateAuthors(*author)
+	if err != nil {
+		return respond.Fail(c, http.StatusBadRequest, http.StatusInternalServerError, err)
+	}
+	authorResult, err := a.AuthorInteractor.Create(c.Context(), author)
 	if err != nil {
 		logger.LogEntrySetFields(c, log.Fields{
 			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
-			"context":     "CreateAuthor",
+			"context":     "InsertAuthor",
 			"resp_status": http.StatusInternalServerError,
 		})
-		c.Status(500)
-		return err
+		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
 
 	}
+	return respond.Success(c, http.StatusOK, authorResult)
+}
 
-	c.JSON(author)
-
+func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
+	err := a.AuthorInteractor.CreateDocument(context.Background(), author)
+	if err != nil {
+		return err
+	}
 	return nil
+}
 
+// ValidateAuthors validates Author struct
+func ValidateAuthors(author model.Author) error {
+	var err error
+
+	err = validation.ValidateStruct(&author,
+		validation.Field(&author.Name, validation.Required),
+		validation.Field(&author.Email, validation.Required, is.Email),
+	)
+	return err
 }

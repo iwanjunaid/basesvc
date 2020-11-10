@@ -27,7 +27,7 @@ func Create(rest interfaces.Rest) func(*fiber.Ctx) error {
 		}
 
 		appController := rest.GetAppController()
-		return appController.Author.CreateAuthor(ctx, &author)
+		return appController.Author.InsertAuthor(ctx)
 	}
 }
 
