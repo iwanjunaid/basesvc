@@ -1,12 +1,18 @@
 package rest
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 	"os/signal"
 
+	"github.com/iwanjunaid/basesvc/config"
+
+	"github.com/jmoiron/sqlx"
+
+	"go.mongodb.org/mongo-driver/mongo"
+
 	swagger "github.com/arsmn/fiber-swagger/v2"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -20,7 +26,7 @@ import (
 
 type RestImpl struct {
 	port          int
-	db            *sql.DB
+	db            *sqlx.DB
 	router        *fiber.App
 	appController *controller.AppController
 	log           *logger.Logger
@@ -40,7 +46,7 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port int, logg *logger.Logger, db *sql.DB) *RestImpl {
+func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
@@ -57,7 +63,7 @@ func NewRest(port int, logg *logger.Logger, db *sql.DB) *RestImpl {
 		_ = app.Shutdown()
 	}()
 
-	registry := registry.NewRegistry(db)
+	registry := registry.NewRegistry(db, registry.NewMongoConn(mdb.Collection(config.GetString("database.collection"))), registry.NewKafkaProducer(kp))
 	appController := registry.NewAppController()
 
 	r := &RestImpl{
@@ -68,6 +74,7 @@ func NewRest(port int, logg *logger.Logger, db *sql.DB) *RestImpl {
 	}
 
 	group.InitRoot(r)
+	group.InitHealthCheck(r)
 	group.InitV1(r)
 	group.InitV2(r)
 	group.InitAuthorV1(r)

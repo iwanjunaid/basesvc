@@ -1,35 +1,43 @@
 {
-  "rest": {
-    "port": 8080
-  },
-  "migration": {
-    "postgres": {
-      "dir": "file://db/migrations/postgres",
-      "search_path": "public"
-    }
-  },
-  "database": {
-    "postgres": {
-      "user": "postgres",
-      "pass": "",
-      "host": "127.0.0.1",
-      "port": 5432,
-      "db": "postgres",
-      "ssl": {
-        "mode": "disable"
-      }
-    },
-    "mysql": {
-      "write": "user:password@tcp(host:port)/database_name"
-    },
-    "redis": {
-      "host": "localhost:6379",
-      "password": "",
-      "db": 1
-    },
-    "mongo": {
-      "uri": "",
-      "db": "basesvc"
-    }
-  }
+	"rest": {
+		"port": 8080
+	},
+	"migration": {
+		"postgres": {
+			"dir": "file://db/migrations/postgres",
+			"search_path": "public"
+		}
+	},
+	"database": {
+		"postgres": {
+			"write": {
+				"user": "postgres",
+				"pass": "",
+				"host": "127.0.0.1",
+				"port": 5432,
+				"db": "postgres",
+				"ssl": {
+					"mode": "disable"
+				}
+			}
+		},
+		"mysql": {
+			"write": "user:password@tcp(host:port)/database_name"
+		},
+		"redis": {
+			"host": "localhost:6379",
+			"password": "",
+			"db": 1
+		},
+		"mongo": {
+			"uri": "mongodb://myUserAdmin:abc123@127.0.0.1:27017",
+			"db": "basesvc",
+			"collection": "basesvc"
+		}
+	},
+	"kafka": {
+		"host": "localhost:9092",
+		"group_id": "local.group",
+		"topics": ["basesvc"]
+	}
 }
