@@ -42,7 +42,6 @@ bin/
 
 ### Go Patch ###
 /vendor/
-/Godeps/
 
 ### Swagger Docs ###
 /docs

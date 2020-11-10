@@ -39,5 +39,10 @@
 		"host": "localhost:9092",
 		"group_id": "local.group",
 		"topics": ["basesvc"]
-	}
+	},
+	"newrelic": {
+          "id": "base-svc",
+          "key": "",
+          "debug": false
+    }
 }

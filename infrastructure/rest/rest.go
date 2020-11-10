@@ -5,13 +5,18 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
+
+	newrelic "github.com/newrelic/go-agent"
+
+	swagger "github.com/arsmn/fiber-swagger/v2"
+	"github.com/gofiber/adaptor/v2"
 	"github.com/iwanjunaid/basesvc/config"
 
 	"github.com/jmoiron/sqlx"
 
 	"go.mongodb.org/mongo-driver/mongo"
 
-	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -46,13 +51,15 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer) *RestImpl {
+func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer, nra newrelic.Application) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
 	app.Use(recover.New())
 	app.Use("/swagger", swagger.Handler)
 	app.Use(logInternal.RequestLogger(logg))
+
+	app.Use(adaptor.HTTPMiddleware(telemetry.Middleware(nra, nil)))
 
 	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)

@@ -27,7 +27,6 @@ const (
 
 	//configuration sources
 	SourceEnv    Source = "env"
-	SourceFile   Source = "file"
 	SourceConsul Source = "consul"
 )
 
