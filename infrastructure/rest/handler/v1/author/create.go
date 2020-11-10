@@ -1,7 +1,9 @@
 package author
 
 import (
+	"errors"
 	"net/http"
+	"regexp"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
@@ -34,6 +36,9 @@ func Create(rest interfaces.Rest) func(*fiber.Ctx) error {
 // isRequestValid validates Author struct
 func isRequestValid(a model.Author) (bool, error) {
 	var err error
+
+	// validation using ozzo-validation module
+	// more info: https://github.com/go-ozzo/ozzo-validation
 	err = validation.ValidateStruct(&a,
 		validation.Field(&a.ID, validation.Required),
 		validation.Field(&a.Name, validation.Required),
@@ -43,5 +48,23 @@ func isRequestValid(a model.Author) (bool, error) {
 		return false, err
 	}
 
+	err = validation.Validate(a.Email, validation.By(onlyGmail))
+	if err != nil {
+		return false, err
+	}
+
 	return true, nil
+}
+
+// onlyGmail validates email must gmail
+func onlyGmail(value interface{}) error {
+	s, _ := value.(string)
+
+	re := regexp.MustCompile(`^[a-zA-Z0-9.!#$%&'*+/=?^_{|}~-]+@gmail\.com`)
+
+	if !re.MatchString(s) {
+		return errors.New("email is not gmail")
+	}
+
+	return nil
 }

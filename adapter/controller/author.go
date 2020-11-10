@@ -87,7 +87,7 @@ func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
 	return nil
 }
 
-// ValidateAuthors validates Author struct
+// ValidateAuthors validates by Author struct
 func ValidateAuthors(author model.Author) error {
 	var err error
 
