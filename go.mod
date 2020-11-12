@@ -14,6 +14,7 @@ require (
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-resty/resty/v2 v2.3.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofiber/adaptor/v2 v2.0.2
 	github.com/gofiber/fiber/v2 v2.1.4
@@ -27,5 +28,7 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/swag v1.6.9
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
+	gopkg.in/resty.v1 v1.12.0
 	go.mongodb.org/mongo-driver v1.4.3
 )
