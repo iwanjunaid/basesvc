@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/iwanjunaid/basesvc/internal/respond"
 
 	"github.com/RoseRocket/xerrs"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/internal/logger"
@@ -87,7 +87,7 @@ func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
 	return nil
 }
 
-// ValidateAuthors validates Author struct
+// ValidateAuthors validates by Author struct
 func ValidateAuthors(author model.Author) error {
 	var err error
 

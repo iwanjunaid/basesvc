@@ -10,6 +10,7 @@ require (
 	github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.5.2
 	github.com/evalphobia/logrus_sentry v0.8.2
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/getsentry/raven-go v0.2.0 // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
@@ -28,6 +29,7 @@ require (
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/swag v1.6.9
+	gopkg.in/fsnotify.v1 v1.4.7
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/resty.v1 v1.12.0
 	go.mongodb.org/mongo-driver v1.4.3
