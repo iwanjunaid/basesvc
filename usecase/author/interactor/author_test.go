@@ -15,15 +15,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-//func setupAuthorPositive() {
-//	entAuthor := &model.Author{
-//		Name:      "123",
-//		Email:     "123",
-//		CreatedAt: time.Now(),
-//		UpdatedAt: time.Now(),
-//	}
-//}
-
 func TestAuthor(t *testing.T) {
 	Convey("Insert Author", t, func() {
 		ctrl := gomock.NewController(t)
@@ -34,7 +25,7 @@ func TestAuthor(t *testing.T) {
 				repoAuthor.EXPECT().Create(context.Background(), nil).Return(nil, errors.New("error"))
 				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
 				_, err := uc.Create(context.Background(), nil)
-				So(err, ShouldBeError)
+				So(err, ShouldNotBeNil)
 			})
 		})
 		Convey("Positive Scenarios", func() {
@@ -54,13 +45,3 @@ func TestAuthor(t *testing.T) {
 		})
 	})
 }
-
-// func TestAuthor(t *testing.T) {
-// 	Convey("Author Test", t, func() {
-// 		Convey("corner cases / negative scenarios", func() {
-// 			Convey("case 1", func() {
-// 				So("done", ShouldEqual, "done")
-// 			})
-// 		})
-// 	})
-// }
