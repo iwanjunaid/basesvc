@@ -18,6 +18,7 @@ require (
 	github.com/gofiber/adaptor/v2 v2.0.2
 	github.com/gofiber/fiber/v2 v2.1.4
 	github.com/golang-migrate/migrate/v4 v4.13.0
+	github.com/golang/mock v1.4.4
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/newrelic/go-agent v3.9.0+incompatible

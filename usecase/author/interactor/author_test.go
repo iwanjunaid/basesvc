@@ -4,41 +4,54 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
-	mockRepo "github.com/iwanjunaid/basesvc/shared/mock/repository"
+	"github.com/iwanjunaid/basesvc/domain/model"
+	repository "github.com/iwanjunaid/basesvc/shared/mock/repository/author"
+
+	"github.com/golang/mock/gomock"
+	_ "github.com/golang/mock/mockgen/model"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-// func setupAuthorPositive() {
-// 	entAuthor = &model.Author{
-// 		ID:        1,
-// 		Name:      "123",
-// 		Email:     "123",
-// 		CreatedAt: time.Now(),
-// 		UpdatedAt: time.Now(),
-// 	}
-// }
+//func setupAuthorPositive() {
+//	entAuthor := &model.Author{
+//		Name:      "123",
+//		Email:     "123",
+//		CreatedAt: time.Now(),
+//		UpdatedAt: time.Now(),
+//	}
+//}
 
 func TestAuthor(t *testing.T) {
 	Convey("Insert Author", t, func() {
-		repoAuthor := &mockRepo.MockAuthorRepository{}
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error ", func() {
-				repoAuthor.On("Create", context.Background(), nil).Return(nil, errors.New("error"))
+				repoAuthor.EXPECT().Create(context.Background(), nil).Return(nil, errors.New("error"))
 				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
-				// _, err := uc.Create(nil, nil)
-				So(uc, ShouldBeNil)
+				_, err := uc.Create(context.Background(), nil)
+				So(err, ShouldBeError)
 			})
 		})
-		// Convey("Positive Scenarios", func() {
-		// 	Convey("Insert Author", func() {
-		// 		setupNpgCardPositive()
-		// 		repoAuthor.On("Create", mock.Anything).Return(nil)
-		// 		uc := NewAuthorInteractor(repoAuthor)
-		// 		err := usecase.interactor.(entAuthor)
-		// 		So(err, ShouldBeNil)
-		// 	})
-		// })
+		Convey("Positive Scenarios", func() {
+			Convey("Insert Author", func() {
+				entAuthor := &model.Author{
+					Name:      "123",
+					Email:     "123",
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}
+				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(entAuthor, nil)
+				//repoAuthor.On("Create", mock.Anything).Return(nil)
+				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
+				res, _ := uc.Create(context.Background(), entAuthor)
+				So(res, ShouldEqual, entAuthor)
+			})
+		})
 	})
 }
 
