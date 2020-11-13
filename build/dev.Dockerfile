@@ -11,5 +11,3 @@ RUN make docs
 RUN make dependencies
 
 EXPOSE 8080
-
-CMD ["air", "-c", "/app/.air.toml"]
