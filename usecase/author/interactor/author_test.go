@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	mockRepo "github.com/iwanjunaid/basesvc/shared/mock/repository"
-	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -26,7 +25,7 @@ func TestAuthor(t *testing.T) {
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error ", func() {
 				repoAuthor.On("Create", context.Background(), nil).Return(nil, errors.New("error"))
-				uc := NewAuthorInteractor(nil, interactor.AuthorSQLRepository())
+				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
 				// _, err := uc.Create(nil, nil)
 				So(uc, ShouldBeNil)
 			})
