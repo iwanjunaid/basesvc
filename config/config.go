@@ -44,7 +44,7 @@ var (
 )
 
 //Configure bootstrap configuration for this service identified by name
-func Configure() {
+func Configure() *viper.Viper {
 	// first lets load .env file
 	if err := godotenv.Load(); err != nil {
 		errEnv = errors.Cause(err)
@@ -96,6 +96,8 @@ func Configure() {
 	if err := c.ReadInConfig(); err != nil {
 		errFile = errors.Cause(err)
 	}
+
+	return c
 }
 
 func Err(s Source) error {
