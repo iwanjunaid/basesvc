@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fsnotify/fsnotify"
+
 	newrelic "github.com/newrelic/go-agent"
 	"github.com/pkg/errors"
 
@@ -42,7 +44,16 @@ var (
 )
 
 func init() {
-	config.Configure()
+	c := config.Configure()
+
+	// hot reload on config change...
+	go func() {
+		c.WatchConfig()
+		c.OnConfigChange(func(e fsnotify.Event) {
+			log.Printf("config file changed %v", e.Name)
+		})
+	}()
+
 	db = InitPostgresDB()
 	logger = InitLogger()
 	telemetry = NewTelemetry(logger)
