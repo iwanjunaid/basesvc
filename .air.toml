@@ -7,7 +7,7 @@ tmp_dir = "tmp"
 
 [build]
 # Just plain old shell command. You could use `make` as well.
-cmd = "make docs && go build -o ./tmp/basesvc main.go"
+cmd = "make docs && go build -a -tags musl -o ./tmp/basesvc main.go"
 # Binary file yields from `cmd`.
 bin = "./tmp/basesvc"
 # Customize binary.

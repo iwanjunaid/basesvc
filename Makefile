@@ -3,7 +3,7 @@ test:
 	go test -v -cover -covermode=atomic ./...
 
 engine:
-	go build CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o ${BINARY}
+	go build CGO_ENABLED=0 GOOS=linux go build -a -tags musl -installsuffix cgo -ldflags '-extldflags "-static"' -o ${BINARY}
 
 dev: setup run-dev
 
@@ -59,6 +59,6 @@ setup:
 
 stop:
 	@echo "> Stop docker-compose"
-	@docker-compose -f deployments/docker-compose.yml down
+	@docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.dev.yml down
 
 .PHONY: clean install unittest lint-prepare lint docs engine dev prod test setup dependencies run-dev run-prod stop
