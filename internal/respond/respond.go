@@ -33,8 +33,9 @@ func (err *Error) Error() string {
 
 func Success(c *fiber.Ctx, status int, content interface{}) error {
 	return c.JSON(&Response{
-		Status:  status,
-		Content: content,
+		RequestId: c.Context().Value("requestid").(string),
+		Status:    status,
+		Content:   content,
 	})
 }
 
@@ -53,7 +54,8 @@ func Fail(c *fiber.Ctx, status, errorCode int, err error) error {
 	}
 	c.Status(status)
 	return c.JSON(&Response{
-		Status: status,
+		RequestId: c.Context().Value("requestid").(string),
+		Status:    status,
 		Error: &Error{
 			Code:    errorCode,
 			Message: message,

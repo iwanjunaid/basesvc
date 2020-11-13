@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/newrelic/go-agent/_integrations/nrmongo"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -16,7 +17,12 @@ func MongoConnect(uri string) (c *mongo.Client, err error) {
 		defaultPingTimeout    = 2 * time.Second
 	)
 	ctx, _ := context.WithTimeout(context.Background(), defaultConnectTimeout)
-	c, err = mongo.Connect(ctx, options.Client().SetConnectTimeout(defaultConnectTimeout).ApplyURI(uri).SetAppName("booking"))
+	nrMon := nrmongo.NewCommandMonitor(nil)
+	opts := []*options.ClientOptions{
+		options.Client().SetConnectTimeout(defaultConnectTimeout).ApplyURI(uri).SetAppName("basesvc"),
+		options.Client().SetMonitor(nrMon),
+	}
+	c, err = mongo.Connect(ctx, opts...)
 	if err != nil {
 		err = errors.Wrap(err, "failed to create mongodb client")
 		return
