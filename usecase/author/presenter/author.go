@@ -6,7 +6,8 @@ import (
 	"github.com/iwanjunaid/basesvc/domain/model"
 )
 
-// AuthorRepository :
+// AuthorPresenter :
 type AuthorPresenter interface {
 	ResponseUsers(context.Context, []*model.Author) ([]*model.Author, error)
+	ResponseUser(context.Context, *model.Author) error
 }

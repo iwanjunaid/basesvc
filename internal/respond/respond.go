@@ -28,7 +28,7 @@ type (
 )
 
 func (err *Error) Error() string {
-	return fmt.Sprintf("error with code: %s; message: %s", err.Code, err.Message)
+	return fmt.Sprintf("error with code: %d; message: %s", err.Code, err.Message)
 }
 
 func Success(c *fiber.Ctx, status int, content interface{}) error {
