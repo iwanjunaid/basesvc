@@ -6,7 +6,6 @@ import (
 	cr "github.com/iwanjunaid/basesvc/adapter/repository/cache"
 	dr "github.com/iwanjunaid/basesvc/adapter/repository/document"
 	er "github.com/iwanjunaid/basesvc/adapter/repository/event"
-	sr "github.com/iwanjunaid/basesvc/adapter/repository/sql"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
