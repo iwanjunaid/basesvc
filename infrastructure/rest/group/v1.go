@@ -1,6 +1,7 @@
 package group
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/internal/interfaces"
 )
 
@@ -18,8 +19,6 @@ import (
 
 // @host localhost:8080
 // @BasePath /v1
-func InitV1(rest interfaces.Rest) {
-	router := rest.GetRouter()
-
-	router.Group("/v1")
+func InitV1(rest interfaces.Rest, root fiber.Router) fiber.Router {
+	return root.Group("/v1")
 }

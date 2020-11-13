@@ -16,6 +16,7 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/iwanjunaid/basesvc/config"
 	"github.com/jmoiron/sqlx"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -95,6 +96,7 @@ func NewTelemetry(l *log.Logger) newrelic.Application {
 		return nil
 	}
 	conf := newrelic.NewConfig(config.GetString(TelemetryID), key)
+	conf.DistributedTracer.Enabled = true
 	conf.Logger = nrlogrus.StandardLogger()
 	if isDebug := config.GetBool(CfgNewRelicDebug); isDebug {
 		l.SetLevel(log.DebugLevel)
@@ -104,6 +106,7 @@ func NewTelemetry(l *log.Logger) newrelic.Application {
 		e.Info(errors.Cause(err))
 		return nil
 	}
+
 	return app
 }
 
