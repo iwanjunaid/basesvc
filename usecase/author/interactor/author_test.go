@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/iwanjunaid/basesvc/adapter/presenter"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	repository "github.com/iwanjunaid/basesvc/shared/mock/repository"
 
@@ -37,10 +38,42 @@ func TestSQLAuthor(t *testing.T) {
 					UpdatedAt: time.Now(),
 				}
 				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(entAuthor, nil)
-				//repoAuthor.On("Create", mock.Anything).Return(nil)
 				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
 				res, _ := uc.Create(context.Background(), entAuthor)
 				So(res, ShouldEqual, entAuthor)
+			})
+		})
+	})
+}
+
+func TestGetSQLAuthor(t *testing.T) {
+	Convey("Get All Author", t, func() {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
+		presenterAuthor := presenter.NewAuthorPresenter()
+		Convey("Negative Scenarios", func() {
+			Convey("Should return error ", func() {
+				repoAuthor.EXPECT().FindAll(context.Background()).Return(nil, errors.New("error"))
+				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
+				_, err := uc.GetAll(context.Background())
+				So(err, ShouldNotBeNil)
+			})
+		})
+		Convey("Positive Scenarios", func() {
+			Convey("Get All Author", func() {
+				var entAuthor []*model.Author
+				entAuthor = append(entAuthor, &model.Author{
+					Name:      "123",
+					Email:     "123",
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				})
+				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
+				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
+				uc := NewAuthorInteractor(presenterAuthor, AuthorSQLRepository(repoAuthor))
+				res, _ := uc.GetAll(context.Background())
+				So(res, ShouldNotBeNil)
 			})
 		})
 	})
