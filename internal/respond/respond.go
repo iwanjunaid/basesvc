@@ -28,13 +28,14 @@ type (
 )
 
 func (err *Error) Error() string {
-	return fmt.Sprintf("error with code: %s; message: %s", err.Code, err.Message)
+	return fmt.Sprintf("error with code: %d; message: %s", err.Code, err.Message)
 }
 
 func Success(c *fiber.Ctx, status int, content interface{}) error {
 	return c.JSON(&Response{
-		Status:  status,
-		Content: content,
+		RequestId: c.Context().Value("requestid").(string),
+		Status:    status,
+		Content:   content,
 	})
 }
 
@@ -53,7 +54,8 @@ func Fail(c *fiber.Ctx, status, errorCode int, err error) error {
 	}
 	c.Status(status)
 	return c.JSON(&Response{
-		Status: status,
+		RequestId: c.Context().Value("requestid").(string),
+		Status:    status,
 		Error: &Error{
 			Code:    errorCode,
 			Message: message,
