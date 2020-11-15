@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
-	repository "github.com/iwanjunaid/basesvc/shared/mock/repository/author"
+	repository "github.com/iwanjunaid/basesvc/shared/mock/repository"
 
 	"github.com/golang/mock/gomock"
 	_ "github.com/golang/mock/mockgen/model"
@@ -15,7 +15,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestAuthor(t *testing.T) {
+func TestSQLAuthor(t *testing.T) {
 	Convey("Insert Author", t, func() {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -41,6 +41,36 @@ func TestAuthor(t *testing.T) {
 				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
 				res, _ := uc.Create(context.Background(), entAuthor)
 				So(res, ShouldEqual, entAuthor)
+			})
+		})
+	})
+}
+
+func TestMongoAuthor(t *testing.T) {
+	Convey("Insert Author", t, func() {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		repoAuthor := repository.NewMockAuthorDocumentRepository(ctrl)
+		Convey("Negative Scenarios", func() {
+			Convey("Should return error ", func() {
+				repoAuthor.EXPECT().Create(context.Background(), nil).Return(errors.New("error"))
+				ucDoc := NewAuthorInteractor(nil, AuthorDocumentRepository(repoAuthor))
+				err := ucDoc.CreateDocument(context.Background(), nil)
+				So(err, ShouldNotBeNil)
+			})
+		})
+		Convey("Positive Scenarios", func() {
+			Convey("Insert Author", func() {
+				entAuthor := &model.Author{
+					Name:      "123",
+					Email:     "123",
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				}
+				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(nil)
+				ucDoc := NewAuthorInteractor(nil, AuthorDocumentRepository(repoAuthor))
+				err := ucDoc.CreateDocument(context.Background(), entAuthor)
+				So(err, ShouldBeNil)
 			})
 		})
 	})
