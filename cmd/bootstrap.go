@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fsnotify/fsnotify"
+
 	newrelic "github.com/newrelic/go-agent"
 	"github.com/pkg/errors"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/iwanjunaid/basesvc/config"
 	"github.com/jmoiron/sqlx"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -41,7 +44,16 @@ var (
 )
 
 func init() {
-	config.Configure()
+	c := config.Configure()
+
+	// hot reload on config change...
+	go func() {
+		c.WatchConfig()
+		c.OnConfigChange(func(e fsnotify.Event) {
+			log.Printf("config file changed %v", e.Name)
+		})
+	}()
+
 	db = InitPostgresDB()
 	logger = InitLogger()
 	telemetry = NewTelemetry(logger)
@@ -84,6 +96,7 @@ func NewTelemetry(l *log.Logger) newrelic.Application {
 		return nil
 	}
 	conf := newrelic.NewConfig(config.GetString(TelemetryID), key)
+	conf.DistributedTracer.Enabled = true
 	conf.Logger = nrlogrus.StandardLogger()
 	if isDebug := config.GetBool(CfgNewRelicDebug); isDebug {
 		l.SetLevel(log.DebugLevel)
@@ -93,6 +106,7 @@ func NewTelemetry(l *log.Logger) newrelic.Application {
 		e.Info(errors.Cause(err))
 		return nil
 	}
+
 	return app
 }
 

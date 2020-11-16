@@ -7,6 +7,7 @@ import (
 
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	newrelic "github.com/newrelic/go-agent"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
@@ -58,9 +59,9 @@ func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp
 	app.Use(recover.New())
 	app.Use("/swagger", swagger.Handler)
 	app.Use(logInternal.RequestLogger(logg))
+	app.Use(requestid.New())
 
 	app.Use(adaptor.HTTPMiddleware(telemetry.Middleware(nra, nil)))
-
 	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -74,18 +75,20 @@ func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp
 	appController := registry.NewAppController()
 
 	r := &RestImpl{
-		db:            db,
-		port:          port,
-		router:        app,
+		db:     db,
+		port:   port,
+		router: app,
+
 		appController: &appController,
 	}
 
-	group.InitRoot(r)
-	group.InitHealthCheck(r)
-	group.InitV1(r)
-	group.InitV2(r)
-	group.InitAuthorV1(r)
-	group.InitAuthorV2(r)
+	root := group.InitRoot(r)
+	group.InitHealthCheck(r, root)
+	v1 := group.InitV1(r, root)
+	v2 := group.InitV2(r, root)
+
+	group.InitAuthorV1(r, v1)
+	group.InitAuthorV2(r, v2)
 
 	return r
 }

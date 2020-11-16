@@ -2,7 +2,7 @@
 FROM golang:1.15.3-alpine3.12 as builder
 
 RUN apk update && apk upgrade && \
-    apk --update add git make
+    apk --update add git make gcc musl-dev
 
 WORKDIR /app
 
