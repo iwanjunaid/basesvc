@@ -34,8 +34,8 @@ func TestSQLAuthor(t *testing.T) {
 				entAuthor := &model.Author{
 					Name:      "123",
 					Email:     "123",
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					CreatedAt: time.Now().Unix(),
+					UpdatedAt: time.Now().Unix(),
 				}
 				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(entAuthor, nil)
 				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor))
@@ -66,8 +66,8 @@ func TestGetSQLAuthor(t *testing.T) {
 				entAuthor = append(entAuthor, &model.Author{
 					Name:      "123",
 					Email:     "123",
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					CreatedAt: time.Now().Unix(),
+					UpdatedAt: time.Now().Unix(),
 				})
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
@@ -97,8 +97,8 @@ func TestMongoAuthor(t *testing.T) {
 				entAuthor := &model.Author{
 					Name:      "123",
 					Email:     "123",
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
+					CreatedAt: time.Now().Unix(),
+					UpdatedAt: time.Now().Unix(),
 				}
 				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(nil)
 				ucDoc := NewAuthorInteractor(nil, AuthorDocumentRepository(repoAuthor))

@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/iwanjunaid/basesvc/internal/respond"
 
 	"github.com/RoseRocket/xerrs"
@@ -19,7 +17,7 @@ import (
 
 type AuthorController interface {
 	GetAuthors(c *fiber.Ctx) error
-	InsertAuthor(c *fiber.Ctx) error
+	InsertAuthor(c context.Context, author *model.Author) (*model.Author, error)
 	InsertDocument(author *model.Author) error
 }
 
@@ -56,27 +54,12 @@ func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
 	return respond.Success(c, http.StatusOK, authors)
 }
 
-func (a *AuthorControllerImpl) InsertAuthor(c *fiber.Ctx) error {
-	var author *model.Author
-	if err := c.BodyParser(&author); err != nil {
-		return err
-	}
-	// Validate Author
-	err := ValidateAuthors(*author)
+func (a *AuthorControllerImpl) InsertAuthor(ctx context.Context, author *model.Author) (*model.Author, error) {
+	author, err := a.AuthorInteractor.Create(ctx, author)
 	if err != nil {
-		return respond.Fail(c, http.StatusBadRequest, http.StatusInternalServerError, err)
+		return nil, err
 	}
-	authorResult, err := a.AuthorInteractor.Create(c.Context(), author)
-	if err != nil {
-		logger.LogEntrySetFields(c, log.Fields{
-			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
-			"context":     "InsertAuthor",
-			"resp_status": http.StatusInternalServerError,
-		})
-		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
-
-	}
-	return respond.Success(c, http.StatusOK, authorResult)
+	return author, nil
 }
 
 func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
@@ -85,15 +68,4 @@ func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
 		return err
 	}
 	return nil
-}
-
-// ValidateAuthors validates by Author struct
-func ValidateAuthors(author model.Author) error {
-	var err error
-
-	err = validation.ValidateStruct(&author,
-		validation.Field(&author.Name, validation.Required),
-		validation.Field(&author.Email, validation.Required, is.Email),
-	)
-	return err
 }
