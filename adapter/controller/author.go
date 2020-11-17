@@ -2,23 +2,15 @@ package controller
 
 import (
 	"context"
-	"net/http"
 
-	"github.com/iwanjunaid/basesvc/internal/respond"
-
-	"github.com/RoseRocket/xerrs"
-	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/domain/model"
-	"github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type AuthorController interface {
-	GetAuthors(c *fiber.Ctx) error
+	GetAuthors(c context.Context) ([]*model.Author, error)
 	InsertAuthor(c context.Context, author *model.Author) (*model.Author, error)
-	InsertDocument(author *model.Author) error
+	InsertDocument(c context.Context, author *model.Author) error
 }
 
 type AuthorControllerImpl struct {
@@ -38,20 +30,12 @@ func NewAuthorController(interactor interactor.AuthorInteractor) AuthorControlle
 // @Produce json
 // @Success 200 {array} model.Author
 // @Router /authors [get]
-func (a *AuthorControllerImpl) GetAuthors(c *fiber.Ctx) error {
-	ctx := c.Context()
+func (a *AuthorControllerImpl) GetAuthors(ctx context.Context) ([]*model.Author, error) {
 	authors, err := a.AuthorInteractor.GetAll(ctx)
-
 	if err != nil {
-		logger.LogEntrySetFields(c, log.Fields{
-			"stack_trace": xerrs.Details(err, logger.ErrMaxStack),
-			"context":     "GetAuthors",
-			"resp_status": http.StatusInternalServerError,
-		})
-		return respond.Fail(c, http.StatusInternalServerError, http.StatusInternalServerError, err)
-
+		return nil, err
 	}
-	return respond.Success(c, http.StatusOK, authors)
+	return authors, nil
 }
 
 func (a *AuthorControllerImpl) InsertAuthor(ctx context.Context, author *model.Author) (*model.Author, error) {
@@ -62,8 +46,8 @@ func (a *AuthorControllerImpl) InsertAuthor(ctx context.Context, author *model.A
 	return author, nil
 }
 
-func (a *AuthorControllerImpl) InsertDocument(author *model.Author) error {
-	err := a.AuthorInteractor.CreateDocument(context.Background(), author)
+func (a *AuthorControllerImpl) InsertDocument(ctx context.Context, author *model.Author) error {
+	err := a.AuthorInteractor.CreateDocument(ctx, author)
 	if err != nil {
 		return err
 	}
