@@ -32,7 +32,7 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/swaggo/swag v1.6.9
 	go.mongodb.org/mongo-driver v1.4.3
 	gopkg.in/resty.v1 v1.12.0
