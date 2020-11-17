@@ -52,7 +52,7 @@ func TestInsertAuthorController(t *testing.T) {
 }
 
 func TestGetAllAuthorController(t *testing.T) {
-	Convey("Insert Author Controller", t, func() {
+	Convey("Get All Author Controller", t, func() {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
@@ -89,7 +89,7 @@ func TestGetAllAuthorController(t *testing.T) {
 }
 
 func TestInsertAuthorDocumentController(t *testing.T) {
-	Convey("Insert Author Controller", t, func() {
+	Convey("Insert Author Document Controller", t, func() {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorDocumentRepository(ctrl)
