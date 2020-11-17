@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/iwanjunaid/basesvc/config"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
 )
@@ -13,9 +15,19 @@ type AuthorEventRepositoryImpl struct {
 	kp *kafka.Producer
 }
 
-func (author *AuthorEventRepositoryImpl) Publish(ctx context.Context, topic string, key, message []byte) (err error) {
-	deliveryChan := make(chan kafka.Event)
+var (
+	topics = config.GetStringSlice("kafka.topics")
+)
 
+func (author *AuthorEventRepositoryImpl) Publish(ctx context.Context, key, message []byte) (err error) {
+	deliveryChan := make(chan kafka.Event)
+	var (
+		topic string
+	)
+
+	if len(topics) > 0 {
+		topic = topics[0]
+	}
 	err = author.kp.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          message,
