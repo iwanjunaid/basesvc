@@ -8,8 +8,6 @@ import (
 // Get handles HTTP GET request for retrieving an author
 func Get(rest interfaces.Rest) func(*fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
-		appController := rest.GetAppController()
-
-		return appController.Author.GetAuthors(ctx)
+		return nil
 	}
 }
