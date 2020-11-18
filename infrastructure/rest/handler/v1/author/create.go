@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/iwanjunaid/basesvc/internal/respond"
+
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/gofiber/fiber/v2"
@@ -15,21 +17,22 @@ import (
 // Create handles HTTP POST requst for creating a new author
 func Create(rest interfaces.Rest) func(*fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
-		var author model.Author
+		var author *model.Author
 		err := ctx.BodyParser(&author)
 
 		if err != nil {
-			ctx.Response().SetStatusCode(http.StatusUnprocessableEntity)
-			return err
+			return respond.Fail(ctx, http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, err)
 		}
-
 		var ok bool
-		if ok, err = isRequestValid(author); !ok {
+		if ok, err = isRequestValid(*author); !ok {
 			return err
 		}
-
 		appController := rest.GetAppController()
-		return appController.Author.InsertAuthor(ctx)
+		authorRes, err := appController.Author.InsertAuthor(ctx.Context(), author)
+		if err != nil {
+			return respond.Fail(ctx, http.StatusInternalServerError, http.StatusInternalServerError, err)
+		}
+		return respond.Success(ctx, http.StatusOK, authorRes)
 	}
 }
 
