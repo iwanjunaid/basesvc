@@ -40,7 +40,6 @@ func (ar *AuthorCacheRepositoryImpl) Create(ctx context.Context, key string, val
 		return err
 	}
 	return nil
-	// panic("implement me")
 }
 
 func NewAuthorCacheRepository(rdb *redis.Ring) repository.AuthorCacheRepository {
