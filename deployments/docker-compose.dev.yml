@@ -13,8 +13,8 @@ services:
       - ../.:/app
     healthcheck:
         test: nc -z localhost 8080
-        interval: 5s
-        timeout: 5s
+        interval: 10s
+        timeout: 10s
         retries: 30
     depends_on:
         postgres:
