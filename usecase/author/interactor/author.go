@@ -59,10 +59,27 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	}
 }
 
-func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) ([]*model.Author, error) {
-	authors, err := ai.AuthorSQLRepository.FindAll(ctx)
+func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) (authors []*model.Author, err error) {
+	// Construct key for redis cache
+	// Key for this example GetAll is `all_authors`
+	key := "all_authors"
+
+	// Get value from redis based on the key
+	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)
+
+	if authors != nil {
+		return ai.AuthorPresenter.ResponseUsers(ctx, authors)
+	}
+
+	// If not available then get from sql repo
+	authors, err = ai.AuthorSQLRepository.FindAll(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	// Set value for the key
+	if err = ai.AuthorCacheRepository.Create(ctx, key, authors); err != nil {
+		panic(err)
 	}
 	return ai.AuthorPresenter.ResponseUsers(ctx, authors)
 }

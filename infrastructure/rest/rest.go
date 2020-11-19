@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
 	"github.com/gofiber/fiber/v2/middleware/requestid"
@@ -52,7 +53,7 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer, nra newrelic.Application) *RestImpl {
+func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer, rdb *redis.Ring, nra newrelic.Application) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
@@ -71,7 +72,7 @@ func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp
 		_ = app.Shutdown()
 	}()
 
-	registry := registry.NewRegistry(db, registry.NewMongoConn(mdb.Collection(config.GetString("database.collection"))), registry.NewKafkaProducer(kp))
+	registry := registry.NewRegistry(db, registry.NewMongoConn(mdb.Collection(config.GetString("database.collection"))), registry.NewKafkaProducer(kp), registry.NewRedisClient(rdb))
 	appController := registry.NewAppController()
 
 	r := &RestImpl{

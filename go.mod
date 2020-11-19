@@ -14,7 +14,9 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/raven-go v0.2.0 // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
+	github.com/go-redis/cache/v8 v8.2.1
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-redis/redis/v8 v8.3.4
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofiber/adaptor/v2 v2.0.2
 	github.com/gofiber/fiber/v2 v2.1.4
