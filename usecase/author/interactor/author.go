@@ -3,9 +3,6 @@ package interactor
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-
-	"github.com/iwanjunaid/basesvc/config"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
@@ -98,9 +95,7 @@ func (ai *AuthorInteractorImpl) CreateDocument(ctx context.Context, author *mode
 
 func (ai *AuthorInteractorImpl) Create(ctx context.Context, author *model.Author) (*model.Author, error) {
 	var (
-		err    error
-		topic  string
-		topics = config.GetStringSlice("kafka.topics")
+		err error
 	)
 	author, err = ai.AuthorSQLRepository.Create(ctx, author)
 	if err != nil {
@@ -111,12 +106,7 @@ func (ai *AuthorInteractorImpl) Create(ctx context.Context, author *model.Author
 		return author, err
 	}
 
-	if len(topics) > 0 {
-		topic = topics[0]
-	}
-
-	if err := ai.AuthorEventRepository.Publish(ctx, topic, nil, dataByt); err != nil {
-		fmt.Println(err.Error())
+	if err := ai.AuthorEventRepository.Publish(ctx, nil, dataByt); err != nil {
 		return author, err
 	}
 	return author, err

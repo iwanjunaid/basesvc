@@ -8,8 +8,6 @@ import (
 // GetAll handles HTTP GET request for retrieving multiple authors
 func GetAll(rest interfaces.Rest) func(*fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
-		appController := rest.GetAppController()
-
-		return appController.Author.GetAuthors(ctx)
+		return nil
 	}
 }
