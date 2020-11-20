@@ -1,9 +1,9 @@
-BINARY=bin/basesvc
+BINARY=basesvc
 test: 
 	go test -v -cover -covermode=atomic ./...
 
 engine:
-	go build CGO_ENABLED=0 GOOS=linux go build -a -tags musl -installsuffix cgo -ldflags '-extldflags "-static"' -o ${BINARY}
+	go build -a -tags musl -o ${BINARY}
 
 dev: setup run-dev
 
