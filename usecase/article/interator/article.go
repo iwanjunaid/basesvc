@@ -4,12 +4,11 @@ import (
 	"context"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
-	"github.com/iwanjunaid/basesvc/usecase/article/repository"
 	"github.com/iwanjunaid/basesvc/usecase/article/presenter"
+	"github.com/iwanjunaid/basesvc/usecase/article/repository"
 )
 
-
-// ArticleInteractor : 
+// ArticleInteractor :
 type ArticleInteractor interface {
 	GetAll(c context.Context)
 	GetByID(c context.Context, id uint) (model.Article, error)
@@ -19,15 +18,14 @@ type ArticleInteractor interface {
 // ArticleInteractorImpl :
 type ArticleInteractorImpl struct {
 	ArticleRepository repository.ArticleRepository
-	ArticlePresenter repository.ArticlePresenter
+	ArticlePresenter  presenter.ArticlePresenter
 }
 
 func (ar *ArticleInteractorImpl) GetAll(c context.Context) (res []*model.Article, err error) {
 	article, err := ar.ArticleRepository.FindAll(c)
 	if err != nil {
-		return 
+		return nil, err
 	}
 
-	return artc
-
+	return article, nil
 }
