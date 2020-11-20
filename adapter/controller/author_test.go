@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"testing"
 	"time"
@@ -22,10 +23,11 @@ func TestInsertAuthorController(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
+		repoEventAuthor := repository.NewMockAuthorEventRepository(ctrl)
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error", func() {
 				repoAuthor.EXPECT().Create(context.Background(), nil).Return(nil, errors.New("error"))
-				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor))
+				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor), in.AuthorEventRepository(repoEventAuthor))
 				svc := NewAuthorController(auCtrl)
 				res, err := svc.InsertAuthor(context.Background(), nil)
 				So(err, ShouldNotBeNil)
@@ -40,8 +42,10 @@ func TestInsertAuthorController(t *testing.T) {
 					CreatedAt: time.Now().Unix(),
 					UpdatedAt: time.Now().Unix(),
 				}
+				entByte, _ := json.Marshal(entAuthor)
+				repoEventAuthor.EXPECT().Publish(context.Background(), nil, entByte).Return(nil)
 				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(entAuthor, nil)
-				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor))
+				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor), in.AuthorEventRepository(repoEventAuthor))
 				svc := NewAuthorController(auCtrl)
 				res, err := svc.InsertAuthor(context.Background(), entAuthor)
 				So(err, ShouldBeNil)

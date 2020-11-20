@@ -20,6 +20,7 @@ var (
 )
 
 func (author *AuthorEventRepositoryImpl) Publish(ctx context.Context, key, message []byte) (err error) {
+	topics := config.GetStringSlice("kafka.topics")
 	deliveryChan := make(chan kafka.Event)
 	var (
 		topic string
