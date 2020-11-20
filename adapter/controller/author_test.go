@@ -27,6 +27,7 @@ func TestInsertAuthorController(t *testing.T) {
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error", func() {
 				repoAuthor.EXPECT().Create(context.Background(), nil).Return(nil, errors.New("error"))
+				repoEventAuthor.EXPECT().Publish(context.Background(), nil, nil).Return(errors.New("error")).AnyTimes()
 				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor), in.AuthorEventRepository(repoEventAuthor))
 				svc := NewAuthorController(auCtrl)
 				res, err := svc.InsertAuthor(context.Background(), nil)
@@ -42,9 +43,9 @@ func TestInsertAuthorController(t *testing.T) {
 					CreatedAt: time.Now().Unix(),
 					UpdatedAt: time.Now().Unix(),
 				}
+				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(entAuthor, nil)
 				entByte, _ := json.Marshal(entAuthor)
 				repoEventAuthor.EXPECT().Publish(context.Background(), nil, entByte).Return(nil)
-				repoAuthor.EXPECT().Create(context.Background(), entAuthor).Return(entAuthor, nil)
 				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor), in.AuthorEventRepository(repoEventAuthor))
 				svc := NewAuthorController(auCtrl)
 				res, err := svc.InsertAuthor(context.Background(), entAuthor)
