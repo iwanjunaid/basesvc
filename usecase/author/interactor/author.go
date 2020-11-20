@@ -3,6 +3,9 @@ package interactor
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+
+	"github.com/iwanjunaid/basesvc/config"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
@@ -66,6 +69,7 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) (authors []*model.Au
 
 	// Get value from redis based on the key
 	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)
+	fmt.Println(authors)
 
 	if authors != nil {
 		return ai.AuthorPresenter.ResponseUsers(ctx, authors)
@@ -94,7 +98,9 @@ func (ai *AuthorInteractorImpl) CreateDocument(ctx context.Context, author *mode
 
 func (ai *AuthorInteractorImpl) Create(ctx context.Context, author *model.Author) (*model.Author, error) {
 	var (
-		err error
+		err    error
+		topic  string
+		topics = config.GetStringSlice("kafka.topics")
 	)
 	author, err = ai.AuthorSQLRepository.Create(ctx, author)
 	if err != nil {
@@ -105,7 +111,12 @@ func (ai *AuthorInteractorImpl) Create(ctx context.Context, author *model.Author
 		return author, err
 	}
 
-	if err := ai.AuthorEventRepository.Publish(ctx, nil, dataByt); err != nil {
+	if len(topics) > 0 {
+		topic = topics[0]
+	}
+
+	if err := ai.AuthorEventRepository.Publish(ctx, topic, nil, dataByt); err != nil {
+		fmt.Println(err.Error())
 		return author, err
 	}
 	return author, err

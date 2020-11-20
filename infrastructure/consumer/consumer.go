@@ -1,7 +1,6 @@
 package consumer
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -63,7 +62,7 @@ func (c *ConsumerImpl) Listen(topic []string) {
 				if err := json.Unmarshal(e.Value, &author); err != nil {
 					fmt.Println(err.Error())
 				}
-				if err := c.appController.Author.InsertDocument(context.Background(), author); err != nil {
+				if err := c.appController.Author.InsertDocument(author); err != nil {
 					fmt.Println(err.Error())
 				}
 			case kafka.PartitionEOF:

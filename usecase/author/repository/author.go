@@ -23,5 +23,5 @@ type AuthorCacheRepository interface {
 }
 
 type AuthorEventRepository interface {
-	Publish(ctx context.Context, key, message []byte) (err error)
+	Publish(ctx context.Context, topic string, key, message []byte) (err error)
 }

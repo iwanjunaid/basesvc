@@ -8,7 +8,8 @@ import (
 // Delete handles HTTP DELETE request for deleting an author
 func Delete(rest interfaces.Rest) func(*fiber.Ctx) error {
 	return func(ctx *fiber.Ctx) error {
+		appController := rest.GetAppController()
 
-		return nil
+		return appController.Author.GetAuthors(ctx)
 	}
 }
