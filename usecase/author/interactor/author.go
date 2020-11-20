@@ -69,7 +69,6 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) (authors []*model.Au
 
 	// Get value from redis based on the key
 	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)
-	fmt.Println(authors)
 
 	if authors != nil {
 		return ai.AuthorPresenter.ResponseUsers(ctx, authors)
