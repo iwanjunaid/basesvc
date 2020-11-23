@@ -79,7 +79,7 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) (authors []*model.Au
 
 	// Set value for the key
 	if err = ai.AuthorCacheRepository.Create(ctx, key, authors); err != nil {
-		panic(err)
+		return nil, err
 	}
 	return ai.AuthorPresenter.ResponseUsers(ctx, authors)
 }
