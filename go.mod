@@ -7,7 +7,6 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/arsmn/fiber-swagger/v2 v2.1.3
 	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef // indirect
-	github.com/cenkalti/backoff/v4 v4.1.0
 	github.com/certifi/gocertifi v0.0.0-20200922220541-2c3bb06c6054 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.5.2
 	github.com/evalphobia/logrus_sentry v0.8.2
@@ -34,7 +33,6 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/swaggo/swag v1.6.9
 	go.mongodb.org/mongo-driver v1.4.3
 	gopkg.in/resty.v1 v1.12.0

@@ -8,5 +8,5 @@ import (
 
 // ArticleRepository :
 type ArticleRepository interface {
-	FindAll(c context.Context) ([]model.Article, error)
+	FindAll(c context.Context) ([]*model.Article, error)
 }
