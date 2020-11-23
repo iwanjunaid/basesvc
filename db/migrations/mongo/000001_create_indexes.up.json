@@ -1,0 +1,13 @@
+[{
+  "createIndexes": "authors",
+  "indexes": [
+    {
+      "key": {
+        "email": 1
+      },
+      "name": "author_unique_email",
+      "unique": true,
+      "background": true
+    }
+  ]
+}]
