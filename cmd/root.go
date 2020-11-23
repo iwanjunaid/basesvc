@@ -14,6 +14,7 @@ var rootCommand = &cobra.Command{
 func Run() {
 	rootCommand.AddCommand(restCommand)
 	rootCommand.AddCommand(migratePqCmd)
+	rootCommand.AddCommand(migrateMongoCmd)
 	rootCommand.AddCommand(consumerCommand)
 
 	if err := rootCommand.Execute(); err != nil {
