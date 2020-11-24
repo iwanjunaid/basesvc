@@ -39,7 +39,7 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 		var (
 			ID                   uuid.UUID
 			name, email          string
-			createdAt, updatedAt int64
+			createdAt, updatedAt time.Time
 		)
 		err := rows.Scan(&ID, &name, &email, &createdAt, &updatedAt)
 		if err != nil {
@@ -50,8 +50,8 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 			ID:        ID,
 			Name:      name,
 			Email:     email,
-			CreatedAt: createdAt,
-			UpdatedAt: updatedAt,
+			CreatedAt: createdAt.Unix(),
+			UpdatedAt: updatedAt.Unix(),
 		})
 	}
 
@@ -61,8 +61,8 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Author) (*model.Author, error) {
 	var (
 		id        = uuid.NewV4()
-		createdAt = time.Now().Unix()
-		updatedAt = time.Now().Unix()
+		createdAt = time.Now()
+		updatedAt = time.Now()
 	)
 
 	query := fmt.Sprintf(`INSERT INTO %s 
@@ -75,8 +75,8 @@ func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Aut
 		return author, err
 	}
 	author.ID = id
-	author.CreatedAt = createdAt
-	author.UpdatedAt = updatedAt
+	author.CreatedAt = createdAt.Unix()
+	author.UpdatedAt = updatedAt.Unix()
 	return author, nil
 }
 

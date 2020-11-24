@@ -25,7 +25,9 @@
 			"write": "user:password@tcp(host:port)/database_name"
 		},
 		"redis": {
-			"host": "localhost:6379",
+			"host": {
+                "local": "localhost:6379"
+            },
 			"password": "",
 			"db": 1
 		},

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/go-redis/redis/v8"
 
 	newrelic "github.com/newrelic/go-agent"
 	"github.com/pkg/errors"
@@ -22,7 +23,9 @@ import (
 
 var (
 	CfgMySql         = "database.mysql"
-	CfgRedis         = "database.redis"
+	CfgRedisHost     = "database.redis.host"
+	CfgRedisPass     = "database.redis.password"
+	CfgRedisDB       = "database.redis.db"
 	CfgKafkaGroup    = "kafka.group_id"
 	CfgKafkaHost     = "kafka.host"
 	CfgKafkaTopic    = "kafka.topics"
@@ -40,6 +43,7 @@ var (
 	kc        *kafka.Consumer
 	kp        *kafka.Producer
 	mdb       *mongo.Database
+	rdb       *redis.Ring
 	telemetry newrelic.Application
 )
 
@@ -60,6 +64,7 @@ func init() {
 	kc = InitKafkaConsumer()
 	kp = InitKafkaProducer()
 	mdb = InitMongoConnect()
+	rdb = InitRedis()
 }
 
 func InitPostgresDB() (db *sqlx.DB) {
@@ -120,4 +125,8 @@ func InitKafkaProducer() *kafka.Producer {
 
 func InitMongoConnect() *mongo.Database {
 	return datastore.MongoMustConnect(config.GetString(CfgMongoURI), config.GetString(CfgMongoDB))
+}
+
+func InitRedis() *redis.Ring {
+	return datastore.NewRedisClient(config.GetStringMapString(CfgRedisHost), config.GetString(CfgRedisPass), config.GetInt(CfgRedisDB))
 }

@@ -139,3 +139,7 @@ func GetFloat64(k string) float64 {
 func GetStringSlice(k string) []string {
 	return c.GetStringSlice(k)
 }
+
+func GetStringMapString(k string) map[string]string {
+	return c.GetStringMapString(k)
+}
