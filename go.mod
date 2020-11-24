@@ -23,7 +23,7 @@ require (
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/newrelic/go-agent v3.9.0+incompatible
-	github.com/newrelic/go-agent/v3 v3.9.0
+	github.com/newrelic/go-agent/v3 v3.9.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.7.0
