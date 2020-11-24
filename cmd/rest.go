@@ -24,7 +24,7 @@ var restCommand = &cobra.Command{
 			defer controller.Stop()
 		}
 
-		rest.NewRest(config.GetInt("rest.port"), logger, db, mdb, kp, telemetry).Serve()
+		rest.NewRest(config.GetInt("rest.port"), logger, db, mdb, kp, rdb, telemetry).Serve()
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 		defer db.Close()

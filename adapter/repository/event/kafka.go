@@ -15,15 +15,13 @@ type AuthorEventRepositoryImpl struct {
 	kp *kafka.Producer
 }
 
-var (
-	topics = config.GetStringSlice("kafka.topics")
-)
-
 func (author *AuthorEventRepositoryImpl) Publish(ctx context.Context, key, message []byte) (err error) {
 	topics := config.GetStringSlice("kafka.topics")
 	deliveryChan := make(chan kafka.Event)
+
 	var (
-		topic string
+		topics = config.GetStringSlice("kafka.topics")
+		topic  string
 	)
 
 	if len(topics) > 0 {

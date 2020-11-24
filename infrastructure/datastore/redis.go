@@ -1,25 +1,18 @@
 package datastore
 
 import (
+	"context"
 	"time"
 
-	r "github.com/go-redis/redis"
+	r "github.com/go-redis/redis/v8"
 )
 
-const (
-	CfgRedisHost = "database.redis.master.address"
-	CfgRedisPass = "database.redis.master.password"
-	CfgRedisDB   = "database.redis.master.db"
-)
+var ctx = context.Background()
 
-func NewRedisClient(host []string, pass string, db int) (client *r.Client) {
+func NewRedisClient(host map[string]string, pass string, db int) (client *r.Ring) {
 
-	if len(host) > 1 {
-		// @TODO: using cluster
-	}
-
-	client = r.NewClient(&r.Options{
-		Addr:         host[0],
+	client = r.NewRing(&r.RingOptions{
+		Addrs:        host,
 		Password:     pass,
 		DB:           db,
 		DialTimeout:  time.Duration(30) * time.Second,
@@ -27,7 +20,7 @@ func NewRedisClient(host []string, pass string, db int) (client *r.Client) {
 		ReadTimeout:  time.Duration(30) * time.Second,
 	})
 
-	if _, err := client.Ping().Result(); err != nil {
+	if _, err := client.Ping(ctx).Result(); err != nil {
 		panic(err)
 	}
 
