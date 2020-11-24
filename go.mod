@@ -21,6 +21,7 @@ require (
 	github.com/gofiber/adaptor/v2 v2.0.3
 	github.com/gofiber/fiber/v2 v2.2.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
+	github.com/golang/mock v1.4.4
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/newrelic/go-agent v3.9.0+incompatible
@@ -28,6 +29,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.7.0
+	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/swag v1.6.9
