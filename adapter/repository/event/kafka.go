@@ -15,11 +15,10 @@ type AuthorEventRepositoryImpl struct {
 }
 
 func (author *AuthorEventRepositoryImpl) Publish(ctx context.Context, key, message []byte) (err error) {
-	deliveryChan := make(chan kafka.Event)
-
 	var (
-		topics = config.GetStringSlice("kafka.topics")
-		topic  string
+		topics       = config.GetStringSlice("kafka.topics")
+		topic        string
+		deliveryChan = make(chan kafka.Event)
 	)
 
 	if len(topics) > 0 {

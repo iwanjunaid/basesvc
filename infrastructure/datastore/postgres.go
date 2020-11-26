@@ -6,12 +6,6 @@ import (
 )
 
 func PostgresConn(dsn string) *sqlx.DB {
-	db, err := sqlx.Open("nrpostgres", dsn)
-	if err != nil {
-		panic(err)
-	}
-	if err := db.Ping(); err != nil {
-		panic(err)
-	}
+	db := sqlx.MustConnect("nrpostgres", dsn)
 	return db
 }

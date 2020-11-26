@@ -5,14 +5,13 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	newrelic "github.com/newrelic/go-agent"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
-	"github.com/gofiber/adaptor/v2"
 	"github.com/iwanjunaid/basesvc/config"
 
 	"github.com/jmoiron/sqlx"
@@ -62,7 +61,7 @@ func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp
 	app.Use(logInternal.RequestLogger(logg))
 	app.Use(requestid.New())
 
-	app.Use(adaptor.HTTPMiddleware(telemetry.Middleware(nra, nil)))
+	app.Use(telemetry.NewrelicMiddleware(nra, nil))
 	// add graceful shutdown when interrupt signal detected
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

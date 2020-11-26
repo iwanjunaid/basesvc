@@ -13,7 +13,6 @@ prod: setup docker run-prod
 dependencies:
 	@echo "> Installing the server dependencies ..."
 	@go mod download
-	@go install github.com/swaggo/swag/cmd/swag
 	@go get -u github.com/cosmtrek/air
 
 unittest:
@@ -48,11 +47,11 @@ docker:
 
 run-dev:
 	@echo "> Run docker-compose [DEV]"
-	@docker-compose -f deployments/docker-compose.dev.yml -f deployments/docker-compose.postgre.yml up --build -d
+	@docker-compose -f deployments/docker-compose.dev.yml up --build -d
 
 run-prod:
 	@echo "> Run docker [PRODUCTION]"
-	@docker-compose -f deployments/docker-compose.yml -f deployments/docker-compose.postgre.yml up --build -d
+	@docker-compose -f deployments/docker-compose.yml up --build -d
 
 setup:
 	@if ! [ -f ".env" ]; then cp .env.dist .env ; fi
