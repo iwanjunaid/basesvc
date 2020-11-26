@@ -23,7 +23,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/iwanjunaid/basesvc/adapter/controller"
-	_ "github.com/iwanjunaid/basesvc/docs"
+	// _ "github.com/iwanjunaid/basesvc/docs"
 	"github.com/iwanjunaid/basesvc/infrastructure/rest/group"
 	logInternal "github.com/iwanjunaid/basesvc/internal/logger"
 	"github.com/iwanjunaid/basesvc/registry"
