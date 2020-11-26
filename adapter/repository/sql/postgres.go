@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
+
 	newrelic "github.com/newrelic/go-agent"
 
 	"github.com/RoseRocket/xerrs"
@@ -24,12 +26,21 @@ type AuthorSQLRepositoryImpl struct {
 }
 
 func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
+
 	var authors []*model.Author
-	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s`, authorsTable)
-	if nr, ok := ctx.Value("telemetry").(newrelic.Transaction); ok {
+
+	if nr, ok := ctx.Value("newRelicTransaction").(newrelic.Transaction); ok {
 		ctx = newrelic.NewContext(ctx, nr)
 	}
+	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s`, authorsTable)
+	ds := telemetry.StartDataSegment(ctx, map[string]interface{}{
+		"collection":   authorsTable,
+		"operation":    "READ",
+		"query":        query,
+		"query_params": map[string]interface{}{},
+	})
 	rows, err := as.db.QueryContext(ctx, query)
+	telemetry.StopDataSegment(ds)
 	if err != nil {
 		err = xerrs.Mask(err, errors.New("error query select"))
 		return authors, err
