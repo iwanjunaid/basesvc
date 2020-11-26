@@ -17,6 +17,7 @@ require (
 	github.com/go-redis/cache/v8 v8.2.1
 	github.com/go-redis/redis/v8 v8.4.0
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/gofiber/adaptor/v2 v2.0.3
 	github.com/gofiber/fiber/v2 v2.2.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/golang/mock v1.4.4
@@ -33,5 +34,4 @@ require (
 	github.com/swaggo/swag v1.6.9
 	github.com/valyala/fasthttp v1.17.0
 	go.mongodb.org/mongo-driver v1.4.3
-	gopkg.in/resty.v1 v1.12.0
 )
