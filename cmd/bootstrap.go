@@ -22,19 +22,23 @@ import (
 )
 
 var (
-	CfgMySql         = "database.mysql"
-	CfgRedisHost     = "database.redis.host"
-	CfgRedisPass     = "database.redis.password"
-	CfgRedisDB       = "database.redis.db"
-	CfgKafkaGroup    = "kafka.group_id"
-	CfgKafkaHost     = "kafka.host"
-	CfgKafkaTopic    = "kafka.topics"
-	CfgNewRelicKey   = "newrelic.key"
-	CfgNewRelicDebug = "newrelic.debug"
-	CfgMongoURI      = "database.mongo.uri"
-	CfgMongoDB       = "database.mongo.db"
-	CfgSentryKey     = "sentry.key"
-	TelemetryID      = "newrelic.id"
+	CfgMySql           = "database.mysql"
+	CfgRedisHost       = "database.redis.host"
+	CfgRedisPass       = "database.redis.password"
+	CfgRedisDB         = "database.redis.db"
+	CfgKafkaGroup      = "kafka.group_id"
+	CfgKafkaHost       = "kafka.host"
+	CfgKafkaProtocol   = "kafka.security_protocol"
+	CfgKafkaMechanisms = "kafka.sasl_mechanisms"
+	CfgKafkaKey        = "kafka.sasl_username"
+	CfgKafkaSecret     = "kafka.sasl_password"
+	CfgKafkaTopic      = "kafka.topics"
+	CfgNewRelicKey     = "newrelic.key"
+	CfgNewRelicDebug   = "newrelic.debug"
+	CfgMongoURI        = "database.mongo.uri"
+	CfgMongoDB         = "database.mongo.db"
+	CfgSentryKey       = "sentry.key"
+	TelemetryID        = "newrelic.id"
 )
 
 var (
@@ -116,11 +120,11 @@ func NewTelemetry(l *log.Logger) newrelic.Application {
 }
 
 func InitKafkaConsumer() *kafka.Consumer {
-	return datastore.NewKafkaConsumer(config.GetString(CfgKafkaHost), config.GetString(CfgKafkaGroup))
+	return datastore.NewKafkaConsumer(config.GetString(CfgKafkaHost), config.GetString(CfgKafkaGroup), config.GetString(CfgKafkaProtocol), config.GetString(CfgKafkaMechanisms), config.GetString(CfgKafkaKey), config.GetString(CfgKafkaSecret))
 }
 
 func InitKafkaProducer() *kafka.Producer {
-	return datastore.NewKafkaProducer(config.GetString(CfgKafkaHost))
+	return datastore.NewKafkaProducer(config.GetString(CfgKafkaHost), config.GetString(CfgKafkaProtocol), config.GetString(CfgKafkaMechanisms), config.GetString(CfgKafkaKey), config.GetString(CfgKafkaSecret))
 }
 
 func InitMongoConnect() *mongo.Database {
