@@ -10,7 +10,7 @@ import (
 )
 
 type AuthorInteractor interface {
-	GetAll(ctx context.Context) ([]*model.Author, error)
+	GetAll(ctx context.Context, key string) ([]*model.Author, error)
 	CreateDocument(ctx context.Context, author *model.Author) error
 	Create(ctx context.Context, author *model.Author) (*model.Author, error)
 }
@@ -59,10 +59,10 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	}
 }
 
-func (ai *AuthorInteractorImpl) GetAll(ctx context.Context) (authors []*model.Author, err error) {
+func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {
 	// Construct key for redis cache
 	// Key for this example GetAll is `all_authors`
-	key := "all_authors"
+	// key := "all_authors"
 
 	// Get value from redis based on the key
 	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)
