@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/iwanjunaid/basesvc/config"
+
 	"github.com/valyala/fasthttp/fasthttpadaptor"
 
 	"github.com/gofiber/fiber/v2"
@@ -33,9 +35,10 @@ func NewrelicMiddleware(nra newrelic.Application, fn PathFn) fiber.Handler {
 				var ctx = r.Context()
 				if nra != nil {
 					txn := nra.StartTransaction(fn(r), w, r)
-					defer func(t newrelic.Transaction) {
-						_ = t.End()
-					}(txn)
+					defer txn.End()
+					//defer func(t newrelic.Transaction) {
+					//	_ = t.End()
+					//}(txn)
 					r = r.WithContext(newrelic.NewContext(r.Context(), txn))
 					c.Locals("newRelicTransaction", txn)
 				}
@@ -74,8 +77,8 @@ func StartDataSegment(c context.Context, payload map[string]interface{}) (s *new
 		Operation:          payload["operation"].(string),
 		ParameterizedQuery: payload["query"].(string),
 		QueryParameters:    payload["query_params"].(map[string]interface{}),
-		Host:               "default",
-		DatabaseName:       "basesvc",
+		Host:               config.GetString("database.postgres.host"),
+		DatabaseName:       config.GetString("database.postgres.db"),
 	}
 
 	s.StartTime = nrt.StartSegmentNow()
