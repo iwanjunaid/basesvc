@@ -5,9 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/iwanjunaid/basesvc/config"
-
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/iwanjunaid/basesvc/config"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
 )
 
@@ -16,7 +15,6 @@ type AuthorEventRepositoryImpl struct {
 }
 
 func (author *AuthorEventRepositoryImpl) Publish(ctx context.Context, key, message []byte) (err error) {
-
 	var (
 		topics       = config.GetStringSlice("kafka.topics")
 		topic        string

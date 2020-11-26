@@ -1,0 +1,6 @@
+[
+  {
+    "dropIndexes": "authors",
+    "index": "author_unique_email"
+  }
+]
