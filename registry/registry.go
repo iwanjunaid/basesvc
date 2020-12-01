@@ -1,6 +1,7 @@
 package registry
 
 import (
+	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,6 +14,7 @@ type registry struct {
 	db  *sqlx.DB
 	mdb *mongo.Collection
 	kP  *kafka.Producer
+	rdb *redis.Ring
 }
 
 type Registry interface {
@@ -44,5 +46,11 @@ func NewMongoConn(mdb *mongo.Collection) Option {
 func NewKafkaProducer(kp *kafka.Producer) Option {
 	return func(i *registry) {
 		i.kP = kp
+	}
+}
+
+func NewRedisClient(rdb *redis.Ring) Option {
+	return func(i *registry) {
+		i.rdb = rdb
 	}
 }

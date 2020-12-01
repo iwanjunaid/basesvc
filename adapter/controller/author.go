@@ -31,7 +31,7 @@ func NewAuthorController(interactor interactor.AuthorInteractor) AuthorControlle
 // @Success 200 {array} model.Author
 // @Router /authors [get]
 func (a *AuthorControllerImpl) GetAuthors(ctx context.Context) ([]*model.Author, error) {
-	authors, err := a.AuthorInteractor.GetAll(ctx)
+	authors, err := a.AuthorInteractor.GetAll(ctx, "all_authors")
 	if err != nil {
 		return nil, err
 	}

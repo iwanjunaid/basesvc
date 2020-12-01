@@ -17,8 +17,9 @@ type AuthorDocumentRepository interface {
 }
 
 type AuthorCacheRepository interface {
-	Find(ctx context.Context) ([]*model.Author, error)
-	Create(ctx context.Context) error
+	Find(ctx context.Context, key string) (*model.Author, error)
+	FindAll(ctx context.Context, key string) ([]*model.Author, error)
+	Create(ctx context.Context, key string, value interface{}) error
 }
 
 type AuthorEventRepository interface {

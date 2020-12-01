@@ -61,11 +61,13 @@ func TestGetAllAuthorController(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
+		repoCacheAuthor := repository.NewMockAuthorCacheRepository(ctrl)
 		presenterAuthor := presenter.NewAuthorPresenter()
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error", func() {
+				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(nil, errors.New("error"))
-				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor))
+				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor), in.AuthorCacheRepository(repoCacheAuthor))
 				svc := NewAuthorController(auCtrl)
 				res, err := svc.GetAuthors(context.Background())
 				So(err, ShouldNotBeNil)
@@ -81,9 +83,11 @@ func TestGetAllAuthorController(t *testing.T) {
 					CreatedAt: time.Now().Unix(),
 					UpdatedAt: time.Now().Unix(),
 				})
+				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
+				repoCacheAuthor.EXPECT().Create(context.Background(), "all_authors", entAuthor).Return(nil)
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
-				auCtrl := in.NewAuthorInteractor(presenterAuthor, in.AuthorSQLRepository(repoAuthor))
+				auCtrl := in.NewAuthorInteractor(presenterAuthor, in.AuthorSQLRepository(repoAuthor), in.AuthorCacheRepository(repoCacheAuthor))
 				svc := NewAuthorController(auCtrl)
 				res, err := svc.GetAuthors(context.Background())
 				So(err, ShouldBeNil)

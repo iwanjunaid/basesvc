@@ -33,7 +33,7 @@ func (r *registry) NewAuthorDocumentRepository() repository.AuthorDocumentReposi
 }
 
 func (r *registry) NewAuthorCacheRepository() repository.AuthorCacheRepository {
-	return cr.NewAuthorCacheRepository()
+	return cr.NewAuthorCacheRepository(r.rdb)
 }
 
 func (r *registry) NewEventRepository() repository.AuthorEventRepository {

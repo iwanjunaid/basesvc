@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
+
 	newrelic "github.com/newrelic/go-agent"
 
 	"github.com/RoseRocket/xerrs"
@@ -24,12 +26,21 @@ type AuthorSQLRepositoryImpl struct {
 }
 
 func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
+
 	var authors []*model.Author
-	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s`, authorsTable)
-	if nr, ok := ctx.Value("telemetry").(newrelic.Transaction); ok {
+
+	if nr, ok := ctx.Value("newRelicTransaction").(newrelic.Transaction); ok {
 		ctx = newrelic.NewContext(ctx, nr)
 	}
+	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s`, authorsTable)
+	ds := telemetry.StartDataSegment(ctx, map[string]interface{}{
+		"collection":   authorsTable,
+		"operation":    "READ",
+		"query":        query,
+		"query_params": map[string]interface{}{},
+	})
 	rows, err := as.db.QueryContext(ctx, query)
+	telemetry.StopDataSegment(ds)
 	if err != nil {
 		err = xerrs.Mask(err, errors.New("error query select"))
 		return authors, err
@@ -39,7 +50,7 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 		var (
 			ID                   uuid.UUID
 			name, email          string
-			createdAt, updatedAt int64
+			createdAt, updatedAt time.Time
 		)
 		err := rows.Scan(&ID, &name, &email, &createdAt, &updatedAt)
 		if err != nil {
@@ -50,8 +61,8 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 			ID:        ID,
 			Name:      name,
 			Email:     email,
-			CreatedAt: createdAt,
-			UpdatedAt: updatedAt,
+			CreatedAt: createdAt.Unix(),
+			UpdatedAt: updatedAt.Unix(),
 		})
 	}
 
@@ -61,8 +72,8 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Author) (*model.Author, error) {
 	var (
 		id        = uuid.NewV4()
-		createdAt = time.Now().Unix()
-		updatedAt = time.Now().Unix()
+		createdAt = time.Now()
+		updatedAt = time.Now()
 	)
 
 	query := fmt.Sprintf(`INSERT INTO %s 
@@ -75,8 +86,8 @@ func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Aut
 		return author, err
 	}
 	author.ID = id
-	author.CreatedAt = createdAt
-	author.UpdatedAt = updatedAt
+	author.CreatedAt = createdAt.Unix()
+	author.UpdatedAt = updatedAt.Unix()
 	return author, nil
 }
 
