@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/RoseRocket/xerrs v1.2.0
-	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751 // indirect
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/arsmn/fiber-swagger/v2 v2.2.0
 	github.com/asaskevich/govalidator v0.0.0-20200907205600-7a23bdc65eef // indirect
 	github.com/cenkalti/backoff/v4 v4.1.0
@@ -37,7 +37,7 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
-	github.com/swaggo/swag v1.6.9 // indirect
+	github.com/swaggo/swag v1.6.9
 	github.com/valyala/fasthttp v1.17.0
 	go.mongodb.org/mongo-driver v1.4.3
 	go.starlark.net v0.0.0-20201118183435-e55f603d8c79 // indirect

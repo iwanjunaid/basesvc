@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/iwanjunaid/basesvc/config"
@@ -33,8 +34,11 @@ func NewrelicMiddleware(nra newrelic.Application, fn PathFn) fiber.Handler {
 		_ = HTTPHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				var ctx = r.Context()
+				fmt.Printf("nra %v \n", nra)
 				if nra != nil {
 					txn := nra.StartTransaction(fn(r), w, r)
+					fmt.Printf("Txn %v \n", txn)
+
 					defer txn.End()
 					//defer func(t newrelic.Transaction) {
 					//	_ = t.End()
