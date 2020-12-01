@@ -38,6 +38,7 @@ var (
 	c    *viper.Viper
 	dirs = []string{
 		".",
+		"/app/config",
 	}
 
 	errEnv, errFile, errConsul error
