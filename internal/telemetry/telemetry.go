@@ -2,7 +2,6 @@ package telemetry
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/iwanjunaid/basesvc/config"
@@ -20,7 +19,7 @@ type endable interface {
 	End() error
 }
 
-const telemetryTxnCtxKey = "telemetry"
+const telemetryTxnCtxKey = "newRelicTransaction"
 
 func NewrelicMiddleware(nra newrelic.Application, fn PathFn) fiber.Handler {
 	if fn == nil {
@@ -33,20 +32,12 @@ func NewrelicMiddleware(nra newrelic.Application, fn PathFn) fiber.Handler {
 		nextHandler := http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) { next = true })
 		_ = HTTPHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				var ctx = r.Context()
-				fmt.Printf("nra %v \n", nra)
 				if nra != nil {
 					txn := nra.StartTransaction(fn(r), w, r)
-					fmt.Printf("Txn %v \n", txn)
+					c.Locals(telemetryTxnCtxKey, txn)
 
-					defer txn.End()
-					//defer func(t newrelic.Transaction) {
-					//	_ = t.End()
-					//}(txn)
-					r = r.WithContext(newrelic.NewContext(r.Context(), txn))
-					c.Locals("newRelicTransaction", txn)
 				}
-				next.ServeHTTP(w, r.WithContext(ctx))
+				next.ServeHTTP(w, r)
 			})
 		}(nextHandler))(c)
 		if next {

@@ -53,31 +53,7 @@ type RestImpl struct {
 // @host localhost:8080
 // @BasePath /v1
 func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer, rdb *redis.Ring, nra newrelic.Application) *RestImpl {
-	app := fiber.New(fiber.Config{
-		// Override default error handler
-		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-			// Statuscode defaults to 500
-			code := fiber.StatusInternalServerError
-
-			// Retreive the custom statuscode if it's an fiber.*Error
-			if e, ok := err.(*fiber.Error); ok {
-				code = e.Code
-			}
-
-			// Notice Error to NewRelic
-			fmt.Println("BeforeNR")
-			txn := telemetry.GetTelemetry(ctx.Context())
-			fmt.Printf("Txn %v \n", txn)
-			txn.NoticeError(err)
-			fmt.Printf("err %s \n", err.Error())
-
-			// Set Content-Type: text/plain; charset=utf-8
-			ctx.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
-
-			// Return statuscode with error message
-			return ctx.Status(code).SendString(err.Error())
-		},
-	})
+	app := fiber.New()
 
 	app.Use(cors.New())
 	app.Use(recover.New())
