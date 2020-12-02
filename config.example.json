@@ -1,0 +1,56 @@
+{
+  "rest": {
+    "port": 8080
+  },
+  "migration": {
+    "postgres": {
+      "dir": "file://db/migrations/postgres",
+      "search_path": "public"
+    }
+  },
+  "database": {
+    "postgres": {
+      "write": {
+        "user": "postgres",
+        "pass": "",
+        "host": "127.0.0.1",
+        "port": 5432,
+        "db": "postgres",
+        "ssl": {
+          "mode": "disable"
+        }
+      }
+    },
+    "mysql": {
+      "write": "user:password@tcp(host:port)/database_name"
+    },
+    "redis": {
+      "host": {
+        "local": "localhost:6379"
+      },
+      "password": "",
+      "db": 1
+    },
+    "mongo": {
+      "uri": "mongodb://myUserAdmin:abc123@127.0.0.1:27017",
+      "db": "basesvc",
+      "collection": "basesvc"
+    }
+  },
+  "kafka": {
+    "host": "localhost:9092",
+    "group_id": "local.group",
+    "security_protocol": "SASL_SSL",
+    "sasl_mechanisms": "PLAIN",
+    "sasl_username": "{{ CLUSTER_API_KEY }}",
+    "sasl_password": "{{ CLUSTER_API_SECRET }}",
+    "topics": [
+      "basesvc"
+    ]
+  },
+  "newrelic": {
+    "id": "base-svc",
+    "key": "",
+    "debug": false
+  }
+}
