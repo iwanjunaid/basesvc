@@ -3,6 +3,7 @@ package respond
 import (
 	"fmt"
 
+	"github.com/RoseRocket/xerrs"
 	"github.com/gofiber/fiber/v2"
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
@@ -50,12 +51,15 @@ func Fail(c *fiber.Ctx, status, errorCode int, err error) error {
 	)
 	txn := telemetry.GetTelemetry(c.Context())
 	defer txn.End()
-	txn.NoticeError(err)
 
 	// if error masked, get detail!
 	if ec, ok := err.(Causer); ok {
 		err = ec.Cause()
 	}
+
+	// if error masked with xerrs, get detail!
+	txn.NoticeError(xerrs.Cause(err))
+
 	if ev, ok2 := err.(validation.Errors); ok2 {
 		message = "there`s some validation issues in request attributes"
 		reason = ev
