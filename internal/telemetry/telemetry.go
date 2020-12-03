@@ -10,7 +10,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	newrelic "github.com/newrelic/go-agent"
+	newrelic "github.com/newrelic/go-agent/v3/newrelic"
 )
 
 type PathFn func(r *http.Request) string
@@ -21,7 +21,7 @@ type endable interface {
 
 const telemetryTxnCtxKey = "newRelicTransaction"
 
-func NewrelicMiddleware(nra newrelic.Application, fn PathFn) fiber.Handler {
+func NewrelicMiddleware(nra *newrelic.Application, fn PathFn) fiber.Handler {
 	if fn == nil {
 		fn = func(r *http.Request) string {
 			return r.Method + " " + r.URL.Path
@@ -33,10 +33,19 @@ func NewrelicMiddleware(nra newrelic.Application, fn PathFn) fiber.Handler {
 		_ = HTTPHandler(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if nra != nil {
-					txn := nra.StartTransaction(fn(r), w, r)
-					c.Locals(telemetryTxnCtxKey, txn)
+					txn := nra.StartTransaction(fn(r))
+					// defer txn.End()
 
+					// This marks the transaction as a web transactions and collects details on
+					// the request attributes
+					txn.SetWebRequestHTTP(r)
+					// This collects details on response code and headers. Use the returned
+					// Writer from here on.
+					w = txn.SetWebResponse(w)
+
+					c.Locals(telemetryTxnCtxKey, txn)
 				}
+
 				next.ServeHTTP(w, r)
 			})
 		}(nextHandler))(c)
@@ -56,7 +65,7 @@ func HTTPHandler(h http.Handler) fiber.Handler {
 	}
 }
 
-func GetTelemetry(c context.Context) newrelic.Transaction {
+func GetTelemetry(c context.Context) *newrelic.Transaction {
 	return newrelic.FromContext(c)
 }
 
@@ -77,12 +86,14 @@ func StartDataSegment(c context.Context, payload map[string]interface{}) (s *new
 	}
 
 	s.StartTime = nrt.StartSegmentNow()
+	defer s.End()
 	return
 }
 
 // StopDataSegment stops newrelic data store segment
-func StopDataSegment(s endable) {
+func StopDataSegment(s endable) (err error) {
 	if s != nil {
-		_ = s.End()
+		err = s.End()
 	}
+	return err
 }
