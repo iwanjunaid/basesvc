@@ -63,7 +63,7 @@ func (g *AuthorGravatarRepositoryImpl) AvatarURL() (avatar string, err error) {
 	}
 
 	// Add path segment avatar
-	baseURL.Path += "avatar"
+	baseURL.Path += "avatar/"
 
 	// Add path segment hash email
 	baseURL.Path += g.hash
