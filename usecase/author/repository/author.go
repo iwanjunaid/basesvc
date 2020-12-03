@@ -7,6 +7,7 @@ import (
 )
 
 type AuthorSQLRepository interface {
+	Find(ctx context.Context, id string) (*model.Author, error)
 	FindAll(ctx context.Context) ([]*model.Author, error)
 	Create(ctx context.Context, author *model.Author) (*model.Author, error)
 }
@@ -24,4 +25,11 @@ type AuthorCacheRepository interface {
 
 type AuthorEventRepository interface {
 	Publish(ctx context.Context, key, message []byte) (err error)
+}
+
+type AuthorGravatarRepository interface {
+	GetProfile() (*model.GravatarProfiles, error)
+	URL() (string, error)
+	JSONURL() (string, error)
+	AvatarURL() (string, error)
 }

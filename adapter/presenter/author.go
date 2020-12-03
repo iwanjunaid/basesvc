@@ -21,6 +21,6 @@ func (presenter *AuthorPresenterImpl) ResponseUsers(ctx context.Context, authors
 	return authors, nil
 }
 
-func (presenter *AuthorPresenterImpl) ResponseUser(ctx context.Context, author *model.Author) (err error) {
-	return
+func (presenter *AuthorPresenterImpl) ResponseUser(ctx context.Context, author *model.Author) (*model.Author, error) {
+	return author, nil
 }

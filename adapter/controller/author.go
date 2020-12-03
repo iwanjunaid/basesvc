@@ -2,12 +2,15 @@ package controller
 
 import (
 	"context"
+	"crypto/sha256"
+	"fmt"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 )
 
 type AuthorController interface {
+	GetAuthor(c context.Context, id string) (*model.Author, error)
 	GetAuthors(c context.Context) ([]*model.Author, error)
 	InsertAuthor(c context.Context, author *model.Author) (*model.Author, error)
 	InsertDocument(c context.Context, author *model.Author) error
@@ -36,6 +39,26 @@ func (a *AuthorControllerImpl) GetAuthors(ctx context.Context) ([]*model.Author,
 		return nil, err
 	}
 	return authors, nil
+}
+
+// GetAuthor godoc
+// @Summary Get author by id
+// @Description get author by id
+// @Tags authors
+// @Produce json
+// @Param id path string true "Author ID"
+// @Success 200 {array} model.Author
+// @Router /authors/{id} [get]
+func (a *AuthorControllerImpl) GetAuthor(ctx context.Context, id string) (*model.Author, error) {
+	h := sha256.New()
+	h.Write([]byte(fmt.Sprintf("author_id=%s", id)))
+	key := fmt.Sprintf("%x", h.Sum(nil))
+
+	author, err := a.AuthorInteractor.Get(ctx, key, id)
+	if err != nil {
+		return nil, err
+	}
+	return author, nil
 }
 
 // InsertAuthor godoc

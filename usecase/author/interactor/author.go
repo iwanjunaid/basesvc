@@ -3,13 +3,16 @@ package interactor
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
+	"github.com/iwanjunaid/basesvc/adapter/repository/api"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
 )
 
 type AuthorInteractor interface {
+	Get(ctx context.Context, key string, id string) (*model.Author, error)
 	GetAll(ctx context.Context, key string) ([]*model.Author, error)
 	CreateDocument(ctx context.Context, author *model.Author) error
 	Create(ctx context.Context, author *model.Author) (*model.Author, error)
@@ -20,6 +23,7 @@ type AuthorInteractorImpl struct {
 	AuthorDocumentRepository repository.AuthorDocumentRepository
 	AuthorCacheRepository    repository.AuthorCacheRepository
 	AuthorEventRepository    repository.AuthorEventRepository
+	AuthorGravatarRepository repository.AuthorGravatarRepository
 	AuthorPresenter          presenter.AuthorPresenter
 }
 
@@ -57,6 +61,41 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	return func(impl *AuthorInteractorImpl) {
 		impl.AuthorEventRepository = event
 	}
+}
+
+func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) (author *model.Author, err error) {
+	// Construct key for redis cache
+	// Key for this example GetAll is `all_authors`
+	// key := "all_authors"
+
+	// Get value from redis based on the key
+	author, err = ai.AuthorCacheRepository.Find(ctx, key)
+
+	if author != nil {
+		return ai.AuthorPresenter.ResponseUser(ctx, author)
+	}
+
+	// If not available then get from sql repo
+	author, err = ai.AuthorSQLRepository.Find(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set value for the key
+	if err = ai.AuthorCacheRepository.Create(ctx, key, author); err != nil {
+		return author, err
+	}
+
+	// Get Gravatar Profile
+	gravatar := api.NewAuthorGravatar(author.Email)
+	avatar, err := gravatar.AvatarURL()
+	fmt.Printf("Avatar : %s \n", avatar)
+	// author.ProfileURL = avatar
+	if err != nil {
+		return author, err
+	}
+
+	return ai.AuthorPresenter.ResponseUser(ctx, author)
 }
 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {

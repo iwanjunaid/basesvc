@@ -63,8 +63,8 @@ func (as *AuthorSQLRepositoryImpl) fetch(ctx context.Context, query string, args
 	return result, nil
 }
 
-func (as *AuthorSQLRepositoryImpl) Find(ctx context.Context, id string, name string, email string) (author *model.Author, err error) {
-	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s WHERE id = $1 or name = $2 or email = $3`, authorsTable)
+func (as *AuthorSQLRepositoryImpl) Find(ctx context.Context, id string) (author *model.Author, err error) {
+	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s WHERE id = $1`, authorsTable)
 
 	if nr, ok := ctx.Value(telemetryTxnCtxKey).(*newrelic.Transaction); ok {
 		ctx = newrelic.NewContext(ctx, nr)
@@ -79,7 +79,7 @@ func (as *AuthorSQLRepositoryImpl) Find(ctx context.Context, id string, name str
 
 	// telemetry.StopDataSegment(ds)
 
-	list, err := as.fetch(ctx, query, id, name, email)
+	list, err := as.fetch(ctx, query, id)
 	if err != nil {
 		err = xerrs.Mask(err, errors.New("error query select"))
 		return author, err
