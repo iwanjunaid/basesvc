@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	r "github.com/go-redis/redis/v8"
+	r "github.com/go-redis/redis/v7"
 )
 
 var ctx = context.Background()
@@ -20,7 +20,7 @@ func NewRedisClient(host map[string]string, pass string, db int) (client *r.Ring
 		ReadTimeout:  time.Duration(30) * time.Second,
 	})
 
-	if _, err := client.Ping(ctx).Result(); err != nil {
+	if _, err := client.Ping().Result(); err != nil {
 		panic(err)
 	}
 

@@ -15,8 +15,8 @@ require (
 	github.com/getsentry/raven-go v0.2.0 // indirect
 	github.com/go-delve/delve v1.5.0 // indirect
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
-	github.com/go-redis/cache/v8 v8.2.1
-	github.com/go-redis/redis/v8 v8.4.0
+	github.com/go-redis/cache/v7 v7.0.2
+	github.com/go-redis/redis/v7 v7.4.0
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofiber/adaptor/v2 v2.0.3
@@ -41,6 +41,7 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/swag v1.6.9
 	github.com/valyala/fasthttp v1.17.0
+	github.com/vmihailenco/msgpack/v4 v4.2.0
 	go.mongodb.org/mongo-driver v1.4.3
 	go.starlark.net v0.0.0-20201118183435-e55f603d8c79 // indirect
 	golang.org/x/arch v0.0.0-20201008161808-52c3e6f60cff // indirect
