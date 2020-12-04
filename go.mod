@@ -17,6 +17,7 @@ require (
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-redis/cache/v8 v8.2.1
 	github.com/go-redis/redis/v8 v8.4.0
+	github.com/go-resty/resty/v2 v2.3.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gofiber/adaptor/v2 v2.0.3
 	github.com/gofiber/fiber/v2 v2.2.0

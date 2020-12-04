@@ -1,14 +1,18 @@
 package api
 
 import (
+	"context"
 	"crypto/md5"
 	"fmt"
 	"net/url"
 	"strconv"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
-	"gopkg.in/resty.v1"
+	newrelic "github.com/newrelic/go-agent/v3/newrelic"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const BASEURL string = "https://www.gravatar.com"
@@ -22,15 +26,17 @@ type (
 		size         int
 		forceDefault bool
 		rating       string
+		context      context.Context
 	}
 )
 
-func NewAuthorGravatar(email string) repository.AuthorGravatarRepository {
+func NewAuthorGravatar(ctx context.Context, email string) repository.AuthorGravatarRepository {
 	bEmail := []byte(email)
 	hash := md5.Sum(bEmail)
 
 	return &AuthorGravatarRepositoryImpl{
-		hash: fmt.Sprintf("%x", hash),
+		hash:    fmt.Sprintf("%x", hash),
+		context: ctx,
 	}
 }
 
@@ -97,12 +103,31 @@ func (g *AuthorGravatarRepositoryImpl) AvatarURL() (avatar string, err error) {
 
 // GetProfile return Gravatar profile struct
 func (g *AuthorGravatarRepositoryImpl) GetProfile() (res *model.GravatarProfiles, err error) {
+	txn := telemetry.GetTelemetry(g.context)
+	defer txn.End()
+
 	client := resty.New()
 
 	// Because Gravatar API use redirect method,
 	// We have to set resty redirect policy.
 	// Assign Client Redirect Policy. Create one as per you need
 	client.SetRedirectPolicy(resty.FlexibleRedirectPolicy(3))
+
+	// Registering Request Middleware
+	client.OnBeforeRequest(func(c *resty.Client, req *resty.Request) error {
+		// Now you have access to Client and current Request object
+		// manipulate it as per your need
+
+		// Newrelic roundtripper
+		c.SetTransport(newrelic.NewRoundTripper(c.GetClient().Transport))
+
+		// Put transaction in the request's context:
+		ctx := req.Context()
+		ctx = newrelic.NewContext(ctx, txn)
+		req.SetContext(ctx)
+
+		return nil // if its success otherwise return error
+	})
 
 	url, err := g.JSONURL()
 	if err != nil {

@@ -3,6 +3,7 @@ package interactor
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/iwanjunaid/basesvc/adapter/repository/api"
 	"github.com/iwanjunaid/basesvc/domain/model"
@@ -62,10 +63,17 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	}
 }
 
-func setAvatar(author *model.Author) (*model.Author, error) {
+func setAvatar(ctx context.Context, author *model.Author) (*model.Author, error) {
 	// Get Gravatar Profile
-	gravatar := api.NewAuthorGravatar(author.Email)
-	avatar, err := gravatar.AvatarURL()
+	var avatar string
+	gravatar := api.NewAuthorGravatar(ctx, author.Email)
+	profile, err := gravatar.GetProfile()
+	fmt.Printf("profile : %v \n", profile)
+
+	if len(profile.Entry) > 0 {
+		avatar = profile.Entry[0].ThumbnailUrl
+	}
+
 	if err != nil {
 		return author, err
 	}
@@ -76,7 +84,7 @@ func setAvatar(author *model.Author) (*model.Author, error) {
 
 func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) (author *model.Author, err error) {
 	defer func() {
-		author, _ = setAvatar(author)
+		author, _ = setAvatar(ctx, author)
 	}()
 
 	// Get value from redis based on the key
@@ -107,7 +115,7 @@ func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {
 	defer func() {
 		for _, author := range authors {
-			author, _ = setAvatar(author)
+			author, _ = setAvatar(ctx, author)
 		}
 	}()
 
