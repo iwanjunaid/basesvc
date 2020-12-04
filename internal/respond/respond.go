@@ -35,10 +35,11 @@ func (err *Error) Error() string {
 
 func Success(c *fiber.Ctx, status int, content interface{}) error {
 	txn := telemetry.GetTelemetry(c.Context())
+	requestID := txn.GetTraceMetadata().TraceID
 	defer txn.End()
-
+	c.Set("X-Request-ID", requestID)
 	return c.JSON(&Response{
-		RequestId: c.Context().Value("requestid").(string),
+		RequestId: requestID,
 		Status:    status,
 		Content:   content,
 	})
@@ -50,6 +51,7 @@ func Fail(c *fiber.Ctx, status, errorCode int, err error) error {
 		reason  = validation.Errors{}
 	)
 	txn := telemetry.GetTelemetry(c.Context())
+	requestID := txn.GetTraceMetadata().TraceID
 	defer txn.End()
 
 	// if error masked, get detail!
@@ -64,9 +66,10 @@ func Fail(c *fiber.Ctx, status, errorCode int, err error) error {
 		message = "there`s some validation issues in request attributes"
 		reason = ev
 	}
+	c.Set("X-Request-ID", requestID)
 	c.Status(status)
 	return c.JSON(&Response{
-		RequestId: c.Context().Value("requestid").(string),
+		RequestId: requestID,
 		Status:    status,
 		Error: &Error{
 			Code:    errorCode,
