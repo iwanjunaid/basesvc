@@ -8,8 +8,6 @@ import (
 
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
-	newrelic "github.com/newrelic/go-agent/v3/newrelic"
-
 	"github.com/RoseRocket/xerrs"
 
 	"github.com/jmoiron/sqlx"
@@ -20,8 +18,7 @@ import (
 )
 
 const (
-	authorsTable       = "authors"
-	telemetryTxnCtxKey = "newRelicTransaction"
+	authorsTable = "authors"
 )
 
 type AuthorSQLRepositoryImpl struct {
@@ -66,10 +63,6 @@ func (as *AuthorSQLRepositoryImpl) fetch(ctx context.Context, query string, args
 func (as *AuthorSQLRepositoryImpl) Find(ctx context.Context, id string) (author *model.Author, err error) {
 	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s WHERE id = $1`, authorsTable)
 
-	if nr, ok := ctx.Value(telemetryTxnCtxKey).(*newrelic.Transaction); ok {
-		ctx = newrelic.NewContext(ctx, nr)
-	}
-
 	telemetry.StartDataSegment(ctx, map[string]interface{}{
 		"collection":   authorsTable,
 		"operation":    "READ",
@@ -98,10 +91,6 @@ func (as *AuthorSQLRepositoryImpl) Find(ctx context.Context, id string) (author 
 func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author, error) {
 
 	var authors []*model.Author
-
-	if nr, ok := ctx.Value(telemetryTxnCtxKey).(*newrelic.Transaction); ok {
-		ctx = newrelic.NewContext(ctx, nr)
-	}
 	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s`, authorsTable)
 	telemetry.StartDataSegment(ctx, map[string]interface{}{
 		"collection":   authorsTable,
@@ -126,10 +115,6 @@ func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Aut
 		createdAt = time.Now()
 		updatedAt = time.Now()
 	)
-
-	if nr, ok := ctx.Value(telemetryTxnCtxKey).(*newrelic.Transaction); ok {
-		ctx = newrelic.NewContext(ctx, nr)
-	}
 
 	query := fmt.Sprintf(`INSERT INTO %s 
 	(id, name, email, created_at, updated_at) 
