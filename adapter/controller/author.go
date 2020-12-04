@@ -38,6 +38,15 @@ func (a *AuthorControllerImpl) GetAuthors(ctx context.Context) ([]*model.Author,
 	return authors, nil
 }
 
+// InsertAuthor godoc
+// @Summary Create a new author
+// @Description create a new author
+// @Tags authors
+// @Accept json
+// @Produce json
+// @Param author body model.Author true "author"
+// @Success 200
+// @Router /authors [post]
 func (a *AuthorControllerImpl) InsertAuthor(ctx context.Context, author *model.Author) (*model.Author, error) {
 	author, err := a.AuthorInteractor.Create(ctx, author)
 	if err != nil {

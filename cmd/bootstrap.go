@@ -6,12 +6,12 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/go-redis/redis/v8"
 
-	newrelic "github.com/newrelic/go-agent"
+	"github.com/newrelic/go-agent/v3/integrations/nrlogrus"
+	newrelic "github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/pkg/errors"
 
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/iwanjunaid/basesvc/infrastructure/datastore"
-	"github.com/newrelic/go-agent/_integrations/nrlogrus"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -48,7 +48,7 @@ var (
 	kp        *kafka.Producer
 	mdb       *mongo.Database
 	rdb       *redis.Ring
-	telemetry newrelic.Application
+	telemetry *newrelic.Application
 )
 
 func init() {
@@ -97,20 +97,28 @@ func InitLogger() *log.Logger {
 	return l
 }
 
-func NewTelemetry(l *log.Logger) newrelic.Application {
+func NewTelemetry(l *log.Logger) *newrelic.Application {
 	key := config.GetString(CfgNewRelicKey)
 	e := l.WithField("component", "newrelic")
 	if len(key) == 0 {
 		e.Warnf("configuration %s is not defined", CfgNewRelicKey)
 		return nil
 	}
-	conf := newrelic.NewConfig(config.GetString(TelemetryID), key)
-	conf.DistributedTracer.Enabled = true
-	conf.Logger = nrlogrus.StandardLogger()
+	// conf := newrelic.NewConfig(config.GetString(TelemetryID), key)
+	// conf.DistributedTracer.Enabled = true
+	// conf.Logger = nrlogrus.StandardLogger()
 	if isDebug := config.GetBool(CfgNewRelicDebug); isDebug {
 		l.SetLevel(log.DebugLevel)
 	}
-	app, err := newrelic.NewApplication(conf)
+	app, err := newrelic.NewApplication(
+		newrelic.ConfigAppName(config.GetString(TelemetryID)),
+		newrelic.ConfigLicense(key),
+		newrelic.ConfigDistributedTracerEnabled(true),
+		nrlogrus.ConfigLogger(l),
+		func(cfg *newrelic.Config) {
+			cfg.ErrorCollector.RecordPanics = true
+		},
+	)
 	if err != nil {
 		e.Info(errors.Cause(err))
 		return nil

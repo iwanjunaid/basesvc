@@ -25,7 +25,7 @@ func Create(rest interfaces.Rest) func(*fiber.Ctx) error {
 		}
 		var ok bool
 		if ok, err = isRequestValid(*author); !ok {
-			return err
+			return respond.Fail(ctx, http.StatusUnprocessableEntity, http.StatusUnprocessableEntity, err)
 		}
 		appController := rest.GetAppController()
 		authorRes, err := appController.Author.InsertAuthor(ctx.Context(), author)

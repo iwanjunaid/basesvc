@@ -3,7 +3,9 @@ package respond
 import (
 	"fmt"
 
+	"github.com/RoseRocket/xerrs"
 	"github.com/gofiber/fiber/v2"
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -32,6 +34,9 @@ func (err *Error) Error() string {
 }
 
 func Success(c *fiber.Ctx, status int, content interface{}) error {
+	txn := telemetry.GetTelemetry(c.Context())
+	defer txn.End()
+
 	return c.JSON(&Response{
 		RequestId: c.Context().Value("requestid").(string),
 		Status:    status,
@@ -44,10 +49,17 @@ func Fail(c *fiber.Ctx, status, errorCode int, err error) error {
 		message = err.Error()
 		reason  = validation.Errors{}
 	)
+	txn := telemetry.GetTelemetry(c.Context())
+	defer txn.End()
+
 	// if error masked, get detail!
 	if ec, ok := err.(Causer); ok {
 		err = ec.Cause()
 	}
+
+	// if error masked with xerrs, get detail!
+	txn.NoticeError(xerrs.Cause(err))
+
 	if ev, ok2 := err.(validation.Errors); ok2 {
 		message = "there`s some validation issues in request attributes"
 		reason = ev
