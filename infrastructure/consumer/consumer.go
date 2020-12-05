@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -45,6 +46,20 @@ func (c *ConsumerImpl) Listen(topic []string) {
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 	run := true
+	var httpPort = ":8080"
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", heartbeat)
+
+	h := &http.Server{Addr: httpPort, Handler: mux}
+
+	go func() {
+		fmt.Println("Listening on http://0.0.0.0:8080")
+		if err := h.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+
 	for run == true {
 		select {
 		case sig := <-sigchan:
@@ -77,4 +92,15 @@ func (c *ConsumerImpl) Listen(topic []string) {
 
 	fmt.Printf("Closing consumer\n")
 	c.kc.Close()
+}
+
+func heartbeat(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte{})
+		return
+	}
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("404 page not found"))
 }
