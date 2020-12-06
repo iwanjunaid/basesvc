@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
-	newrelic "github.com/newrelic/go-agent"
+	newrelic "github.com/newrelic/go-agent/v3/newrelic"
 
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/iwanjunaid/basesvc/config"
@@ -52,7 +52,7 @@ type RestImpl struct {
 
 // @host localhost:8080
 // @BasePath /v1
-func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer, rdb *redis.Ring, nra newrelic.Application) *RestImpl {
+func NewRest(port int, logg *logger.Logger, db *sqlx.DB, mdb *mongo.Database, kp *kafka.Producer, rdb *redis.Ring, nra *newrelic.Application) *RestImpl {
 	app := fiber.New()
 
 	app.Use(cors.New())
