@@ -3,7 +3,6 @@ package config
 import (
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -138,15 +137,7 @@ func GetFloat64(k string) float64 {
 }
 
 func GetStringSlice(k string) []string {
-	val := c.GetString(k)
-	splitted := strings.Split(val, ",")
-	var cleaned []string
-
-	for _, v := range splitted {
-		cleaned = append(cleaned, strings.TrimSpace(v))
-	}
-
-	return cleaned
+	return c.GetStringSlice(k)
 }
 
 func GetStringMapString(k string) map[string]string {
