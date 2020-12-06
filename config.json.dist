@@ -4,51 +4,51 @@
   },
   "migration": {
     "postgres": {
-      "dir": $MIGRATION_POSTGRES_DIR,
-      "search_path": $MIGRATION_POSTGRES_SEARCH_PATH
+      "dir": "$MIGRATION_POSTGRES_DIR",
+      "search_path": "$MIGRATION_POSTGRES_SEARCH_PATH"
     }
   },
   "database": {
     "postgres": {
       "write": {
-        "user": $DATABASE_POSTGRES_WRITE_USER,
-        "pass": $DATABASE_POSTGRES_WRITE_PASS,
-        "host": $DATABASE_POSTGRES_WRITE_HOST,
+        "user": "$DATABASE_POSTGRES_WRITE_USER",
+        "pass": "$DATABASE_POSTGRES_WRITE_PASS",
+        "host": "$DATABASE_POSTGRES_WRITE_HOST",
         "port": $DATABASE_POSTGRES_WRITE_PORT,
-        "db": $DATABASE_POSTGRES_WRITE_DB,
+        "db": "$DATABASE_POSTGRES_WRITE_DB",
         "ssl": {
-          "mode": $DATABASE_POSTGRES_WRITE_SSL_MOD
+          "mode": "$DATABASE_POSTGRES_WRITE_SSL_MODE"
         }
       }
     },
     "mysql": {
-      "write": $DATABASE_MYSQL_WRITE
+      "write": "$DATABASE_MYSQL_WRITE"
     },
     "redis": {
       "host": {
-        "local": $DATABASE_REDIS_HOST
+        "local": "$DATABASE_REDIS_HOST"
       },
-      "password": $DATABASE_REDIS_PASSWORD,
+      "password": $DATABASE_REDIS_PASSWORD",
       "db": $DATABASE_REDIS_DB
     },
     "mongo": {
-      "uri": $DATABASE_MONGO_URI,
-      "db": $DATABASE_MONGO_DB,
-      "collection": $DATABASE_MONGO_COLLECTIONS
+      "uri": "$DATABASE_MONGO_URI",
+      "db": "$DATABASE_MONGO_DB",
+      "collection": "$DATABASE_MONGO_COLLECTIONS"
     }
   },
   "kafka": {
-    "host": $KAFKA_HOST,
-    "group_id": $KAFKA_GROUP_ID,
-    "security_protocol": $KAFKA_SECURITY_PROTOCOL,
-    "sasl_mechanisms": $KAFKA_SASL_MECHANISMS,
-    "sasl_username": $KAFKA_SASL_USERNAME,
-    "sasl_password": $KAFKA_SASL_PASSWORD,
+    "host": "$KAFKA_HOST",
+    "group_id": "$KAFKA_GROUP_ID",
+    "security_protocol": "$KAFKA_SECURITY_PROTOCOL",
+    "sasl_mechanisms": "$KAFKA_SASL_MECHANISMS",
+    "sasl_username": "$KAFKA_SASL_USERNAME",
+    "sasl_password": "$KAFKA_SASL_PASSWORD",
     "topics": $KAFKA_TOPICS
   },
   "newrelic": {
-    "id": $NEWRELIC_ID,
-    "key": $NEWRELIC_KEY,
+    "id": "$NEWRELIC_ID",
+    "key": "$NEWRELIC_KEY",
     "debug": $NEWRELIC_DEBUG
   }
 }
