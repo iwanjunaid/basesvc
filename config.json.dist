@@ -28,7 +28,7 @@
       "host": {
         "local": "$DATABASE_REDIS_HOST"
       },
-      "password": $DATABASE_REDIS_PASSWORD",
+      "password": "$DATABASE_REDIS_PASSWORD",
       "db": $DATABASE_REDIS_DB
     },
     "mongo": {
