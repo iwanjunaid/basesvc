@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v7"
 	"github.com/jmoiron/sqlx"
 
 	"go.mongodb.org/mongo-driver/mongo"

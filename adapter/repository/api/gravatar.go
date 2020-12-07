@@ -1,18 +1,24 @@
-package gravatar
+package api
 
 import (
+	"context"
 	"crypto/md5"
 	"fmt"
 	"net/url"
 	"strconv"
 
-	"gopkg.in/resty.v1"
+	"github.com/iwanjunaid/basesvc/domain/model"
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
+	"github.com/iwanjunaid/basesvc/usecase/author/repository"
+	newrelic "github.com/newrelic/go-agent/v3/newrelic"
+
+	"github.com/go-resty/resty/v2"
 )
 
 const BASEURL string = "https://www.gravatar.com"
 
 type (
-	Gravatar struct {
+	AuthorGravatarRepositoryImpl struct {
 		email        string
 		hash         string
 		defaultURL   string
@@ -20,44 +26,22 @@ type (
 		size         int
 		forceDefault bool
 		rating       string
-	}
-	photo struct {
-		Value string `json:"value"`
-		Type  string `json:"type"`
-	}
-	profiles struct {
-		Entry []profile `json:"entry"`
-	}
-	profile struct {
-		Id           string   `json:"id"`
-		Hash         string   `json:"hash"`
-		RequestHash  string   `json:"requestHash"`
-		ProfileUrl   string   `json:"profileUrl"`
-		ThumbnailUrl string   `json:"thumbnailUrl"`
-		Photos       []photo  `json:"photos"`
-		Name         []string `json:"name"`
-		DisplayName  string   `json:"displayName"`
-		Urls         []string `json:"urls"`
+		context      context.Context
 	}
 )
 
-func New(email string) *Gravatar {
+func NewAuthorGravatar(ctx context.Context, email string) repository.AuthorGravatarRepository {
 	bEmail := []byte(email)
 	hash := md5.Sum(bEmail)
 
-	return &Gravatar{
-		email:        email,
-		hash:         fmt.Sprintf("%x", hash),
-		defaultURL:   "",
-		defaultValue: "",
-		size:         0,
-		forceDefault: false,
-		rating:       "",
+	return &AuthorGravatarRepositoryImpl{
+		hash:    fmt.Sprintf("%x", hash),
+		context: ctx,
 	}
 }
 
 // URL return profile url
-func (g *Gravatar) URL() (string, error) {
+func (g *AuthorGravatarRepositoryImpl) URL() (string, error) {
 	baseURL, err := url.Parse((BASEURL))
 	if err != nil {
 		return "", err
@@ -67,7 +51,7 @@ func (g *Gravatar) URL() (string, error) {
 }
 
 // JSONURL return profile url in json
-func (g *Gravatar) JSONURL() (string, error) {
+func (g *AuthorGravatarRepositoryImpl) JSONURL() (string, error) {
 	baseURL, err := url.Parse((BASEURL))
 	if err != nil {
 		return "", err
@@ -78,14 +62,14 @@ func (g *Gravatar) JSONURL() (string, error) {
 }
 
 // AvatarURL return url of avatar
-func (g *Gravatar) AvatarURL() (avatar string, err error) {
+func (g *AuthorGravatarRepositoryImpl) AvatarURL() (avatar string, err error) {
 	baseURL, err := url.Parse(BASEURL)
 	if err != nil {
 		return
 	}
 
 	// Add path segment avatar
-	baseURL.Path += "avatar"
+	baseURL.Path += "avatar/"
 
 	// Add path segment hash email
 	baseURL.Path += g.hash
@@ -118,7 +102,10 @@ func (g *Gravatar) AvatarURL() (avatar string, err error) {
 }
 
 // GetProfile return Gravatar profile struct
-func (g *Gravatar) GetProfile() (res *profiles, err error) {
+func (g *AuthorGravatarRepositoryImpl) GetProfile() (res *model.GravatarProfiles, err error) {
+	txn := telemetry.GetTelemetry(g.context)
+	defer txn.End()
+
 	client := resty.New()
 
 	// Because Gravatar API use redirect method,
@@ -126,12 +113,28 @@ func (g *Gravatar) GetProfile() (res *profiles, err error) {
 	// Assign Client Redirect Policy. Create one as per you need
 	client.SetRedirectPolicy(resty.FlexibleRedirectPolicy(3))
 
+	// Registering Request Middleware
+	client.OnBeforeRequest(func(c *resty.Client, req *resty.Request) error {
+		// Now you have access to Client and current Request object
+		// manipulate it as per your need
+
+		// Newrelic roundtripper
+		c.SetTransport(newrelic.NewRoundTripper(c.GetClient().Transport))
+
+		// Put transaction in the request's context:
+		ctx := req.Context()
+		ctx = newrelic.NewContext(ctx, txn)
+		req.SetContext(ctx)
+
+		return nil // if its success otherwise return error
+	})
+
 	url, err := g.JSONURL()
 	if err != nil {
 		return
 	}
 
-	res = &profiles{}
+	res = &model.GravatarProfiles{}
 	resp, err := client.R().
 		SetResult(res).
 		Get(url)

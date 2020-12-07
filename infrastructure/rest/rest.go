@@ -7,7 +7,7 @@ import (
 
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v7"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	newrelic "github.com/newrelic/go-agent/v3/newrelic"
 
