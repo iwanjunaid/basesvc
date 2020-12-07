@@ -3,13 +3,16 @@ package interactor
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
+	"github.com/iwanjunaid/basesvc/adapter/repository/api"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
 )
 
 type AuthorInteractor interface {
+	Get(ctx context.Context, key string, id string) (*model.Author, error)
 	GetAll(ctx context.Context, key string) ([]*model.Author, error)
 	CreateDocument(ctx context.Context, author *model.Author) error
 	Create(ctx context.Context, author *model.Author) (*model.Author, error)
@@ -20,6 +23,7 @@ type AuthorInteractorImpl struct {
 	AuthorDocumentRepository repository.AuthorDocumentRepository
 	AuthorCacheRepository    repository.AuthorCacheRepository
 	AuthorEventRepository    repository.AuthorEventRepository
+	AuthorGravatarRepository repository.AuthorGravatarRepository
 	AuthorPresenter          presenter.AuthorPresenter
 }
 
@@ -59,10 +63,61 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	}
 }
 
+func setAvatar(ctx context.Context, author *model.Author) (*model.Author, error) {
+	// Get Gravatar Profile
+	var avatar string
+	gravatar := api.NewAuthorGravatar(ctx, author.Email)
+	profile, err := gravatar.GetProfile()
+	fmt.Printf("profile : %v \n", profile)
+
+	if len(profile.Entry) > 0 {
+		avatar = profile.Entry[0].ThumbnailUrl
+	}
+
+	if err != nil {
+		return author, err
+	}
+	author.Avatar = avatar
+
+	return author, nil
+}
+
+func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) (author *model.Author, err error) {
+	defer func() {
+		author, _ = setAvatar(ctx, author)
+	}()
+
+	// Get value from redis based on the key
+	author, err = ai.AuthorCacheRepository.Find(ctx, key)
+
+	if author != nil {
+		return ai.AuthorPresenter.ResponseUser(ctx, author)
+	}
+
+	// If not available then get from sql repo
+	author, err = ai.AuthorSQLRepository.Find(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Set value for the key
+	if err = ai.AuthorCacheRepository.Create(ctx, key, author); err != nil {
+		return author, err
+	}
+
+	if err != nil {
+		return author, err
+	}
+
+	return ai.AuthorPresenter.ResponseUser(ctx, author)
+}
+
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {
-	// Construct key for redis cache
-	// Key for this example GetAll is `all_authors`
-	// key := "all_authors"
+	defer func() {
+		for _, author := range authors {
+			author, _ = setAvatar(ctx, author)
+		}
+	}()
 
 	// Get value from redis based on the key
 	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)

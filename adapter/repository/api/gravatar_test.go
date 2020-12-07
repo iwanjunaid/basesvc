@@ -1,4 +1,4 @@
-package gravatar
+package api
 
 import (
 	"reflect"
