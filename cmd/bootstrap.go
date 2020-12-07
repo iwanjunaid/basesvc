@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v7"
 
 	"github.com/newrelic/go-agent/v3/integrations/nrlogrus"
 	newrelic "github.com/newrelic/go-agent/v3/newrelic"
