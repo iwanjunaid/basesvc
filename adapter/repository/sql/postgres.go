@@ -63,16 +63,15 @@ func (as *AuthorSQLRepositoryImpl) fetch(ctx context.Context, query string, args
 func (as *AuthorSQLRepositoryImpl) Find(ctx context.Context, id string) (author *model.Author, err error) {
 	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s WHERE id = $1`, authorsTable)
 
-	telemetry.StartDataSegment(ctx, map[string]interface{}{
+	ds := telemetry.StartDataSegment(ctx, map[string]interface{}{
 		"collection":   authorsTable,
 		"operation":    "READ",
 		"query":        query,
 		"query_params": map[string]interface{}{},
 	})
 
-	// telemetry.StopDataSegment(ds)
-
 	list, err := as.fetch(ctx, query, id)
+	ds.End()
 	if err != nil {
 		err = xerrs.Mask(err, errors.New("error query select"))
 		return author, err
@@ -92,7 +91,7 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 
 	var authors []*model.Author
 	query := fmt.Sprintf(`SELECT id, name, email, created_at, updated_at FROM %s`, authorsTable)
-	telemetry.StartDataSegment(ctx, map[string]interface{}{
+	ds := telemetry.StartDataSegment(ctx, map[string]interface{}{
 		"collection":   authorsTable,
 		"operation":    "READ",
 		"query":        query,
@@ -101,6 +100,7 @@ func (as *AuthorSQLRepositoryImpl) FindAll(ctx context.Context) ([]*model.Author
 
 	// return authors, nil
 	authors, err := as.fetch(ctx, query)
+	ds.End()
 	if err != nil {
 		err = xerrs.Mask(err, errors.New("error query select"))
 		return authors, err
@@ -121,7 +121,7 @@ func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Aut
 	VALUES 
 	($1, $2, $3, $4, $5)`, authorsTable)
 
-	telemetry.StartDataSegment(ctx, map[string]interface{}{
+	ds := telemetry.StartDataSegment(ctx, map[string]interface{}{
 		"collection":   authorsTable,
 		"operation":    "INSERT",
 		"query":        query,
@@ -129,6 +129,7 @@ func (as *AuthorSQLRepositoryImpl) Create(ctx context.Context, author *model.Aut
 	})
 
 	_, err := as.db.ExecContext(ctx, query, id, author.Name, author.Email, createdAt, updatedAt)
+	ds.End()
 	if err != nil {
 		err = xerrs.Mask(err, errors.New("error query insert"))
 		return author, err
