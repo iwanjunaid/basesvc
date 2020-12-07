@@ -33,3 +33,8 @@ type AuthorGravatarRepository interface {
 	JSONURL() (string, error)
 	AvatarURL() (string, error)
 }
+
+type AuthorGravatarCacheRepository interface {
+	Find(ctx context.Context, key string) (*model.GravatarProfiles, error)
+	Create(ctx context.Context, key string, value interface{}) error
+}

@@ -21,6 +21,7 @@ func (r *registry) NewAuthorInteractor() interactor.AuthorInteractor {
 		interactor.AuthorSQLRepository(r.NewAuthorSQLRepository()),
 		interactor.AuthorDocumentRepository(r.NewAuthorDocumentRepository()),
 		interactor.AuthorCacheRepository(r.NewAuthorCacheRepository()),
+		interactor.AuthorGravatarCacheRepository(r.NewAuthorGravatarCacheRepository()),
 		interactor.AuthorEventRepository(r.NewEventRepository()))
 }
 
@@ -34,6 +35,10 @@ func (r *registry) NewAuthorDocumentRepository() repository.AuthorDocumentReposi
 
 func (r *registry) NewAuthorCacheRepository() repository.AuthorCacheRepository {
 	return cr.NewAuthorCacheRepository(r.rdb)
+}
+
+func (r *registry) NewAuthorGravatarCacheRepository() repository.AuthorGravatarCacheRepository {
+	return cr.NewAuthorGravatarCacheRepository(r.rdb)
 }
 
 func (r *registry) NewEventRepository() repository.AuthorEventRepository {

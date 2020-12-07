@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 
@@ -19,12 +20,13 @@ type AuthorInteractor interface {
 }
 
 type AuthorInteractorImpl struct {
-	AuthorSQLRepository      repository.AuthorSQLRepository
-	AuthorDocumentRepository repository.AuthorDocumentRepository
-	AuthorCacheRepository    repository.AuthorCacheRepository
-	AuthorEventRepository    repository.AuthorEventRepository
-	AuthorGravatarRepository repository.AuthorGravatarRepository
-	AuthorPresenter          presenter.AuthorPresenter
+	AuthorSQLRepository           repository.AuthorSQLRepository
+	AuthorDocumentRepository      repository.AuthorDocumentRepository
+	AuthorCacheRepository         repository.AuthorCacheRepository
+	AuthorEventRepository         repository.AuthorEventRepository
+	AuthorGravatarRepository      repository.AuthorGravatarRepository
+	AuthorGravatarCacheRepository repository.AuthorGravatarCacheRepository
+	AuthorPresenter               presenter.AuthorPresenter
 }
 
 type Option func(impl *AuthorInteractorImpl)
@@ -57,20 +59,25 @@ func AuthorCacheRepository(cache repository.AuthorCacheRepository) Option {
 	}
 }
 
+func AuthorGravatarCacheRepository(cache repository.AuthorGravatarCacheRepository) Option {
+	return func(impl *AuthorInteractorImpl) {
+		impl.AuthorGravatarCacheRepository = cache
+	}
+}
+
 func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	return func(impl *AuthorInteractorImpl) {
 		impl.AuthorEventRepository = event
 	}
 }
 
-func setAvatar(ctx context.Context, author *model.Author) (*model.Author, error) {
-	// Get Gravatar Profile
+func (ai *AuthorInteractorImpl) setAvatar(ctx context.Context, author *model.Author) (*model.Author, error) {
+	// Set Gravatar Profile
 	var avatar string
-	gravatar := api.NewAuthorGravatar(ctx, author.Email)
-	profile, err := gravatar.GetProfile()
-	fmt.Printf("profile : %v \n", profile)
 
-	if len(profile.Entry) > 0 {
+	profile, err := ai.getAvatar(ctx, author)
+
+	if profile != nil && len(profile.Entry) > 0 {
 		avatar = profile.Entry[0].ThumbnailUrl
 	}
 
@@ -82,9 +89,40 @@ func setAvatar(ctx context.Context, author *model.Author) (*model.Author, error)
 	return author, nil
 }
 
+func (ai *AuthorInteractorImpl) getAvatar(ctx context.Context, author *model.Author) (profile *model.GravatarProfiles, err error) {
+	// Get Gravatar Profile
+	gravatar := api.NewAuthorGravatar(ctx, author.Email)
+
+	profile = &model.GravatarProfiles{}
+
+	// Key
+	h := sha256.New()
+	h.Write([]byte(author.Email))
+	key := fmt.Sprintf("%x", h.Sum(nil))
+
+	// Get cache from redis
+	profile, err = ai.AuthorGravatarCacheRepository.Find(ctx, key)
+
+	if profile != nil {
+		return profile, nil
+	}
+
+	profile, err = gravatar.GetProfile()
+	if err != nil {
+		return nil, err
+	}
+
+	// Set value for the key
+	if err = ai.AuthorGravatarCacheRepository.Create(ctx, key, profile); err != nil {
+		return profile, err
+	}
+
+	return profile, nil
+}
+
 func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) (author *model.Author, err error) {
 	defer func() {
-		author, _ = setAvatar(ctx, author)
+		author, _ = ai.setAvatar(ctx, author)
 	}()
 
 	// Get value from redis based on the key
@@ -115,7 +153,7 @@ func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {
 	defer func() {
 		for _, author := range authors {
-			author, _ = setAvatar(ctx, author)
+			author, _ = ai.setAvatar(ctx, author)
 		}
 	}()
 
