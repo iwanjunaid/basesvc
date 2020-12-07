@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-redis/redis/v7"
 	"github.com/iwanjunaid/basesvc/config"
 
 	"github.com/valyala/fasthttp/fasthttpadaptor"
@@ -86,7 +87,7 @@ func StartDataSegment(c context.Context, payload map[string]interface{}) (s *new
 	}
 
 	s.StartTime = nrt.StartSegmentNow()
-	defer s.End()
+	// defer s.End()
 	return
 }
 
@@ -96,4 +97,12 @@ func StopDataSegment(s endable) (err error) {
 		err = s.End()
 	}
 	return err
+}
+
+// StartRedisSegment starts newrelic datastore redis for newrelic transaction
+func StartRedisSegment(c context.Context, rdb *redis.Ring) *redis.Ring {
+	txn := GetTelemetry(c)
+	ctx := newrelic.NewContext(rdb.Context(), txn)
+
+	return rdb.WithContext(ctx)
 }
