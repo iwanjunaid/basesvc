@@ -3,6 +3,8 @@ package api
 import (
 	"reflect"
 	"testing"
+
+	"github.com/iwanjunaid/basesvc/domain/model"
 )
 
 func TestGravatar_GetProfile(t *testing.T) {
@@ -18,7 +20,7 @@ func TestGravatar_GetProfile(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
-		wantRes *profiles
+		wantRes *model.GravatarProfiles
 		wantErr bool
 	}{
 		// TODO: Add test cases.
@@ -30,15 +32,15 @@ func TestGravatar_GetProfile(t *testing.T) {
 			size:         0,
 			forceDefault: false,
 			rating:       "",
-		}, &profiles{
-			Entry: []profile{
+		}, &model.GravatarProfiles{
+			Entry: []model.Profile{
 				{
 					"103714164",
 					"cd601941419730dbc79bbc41180ab703",
 					"cd601941419730dbc79bbc41180ab703",
 					"http://gravatar.com/mrisilmi",
 					"https://secure.gravatar.com/avatar/cd601941419730dbc79bbc41180ab703",
-					[]photo{{"https://secure.gravatar.com/avatar/cd601941419730dbc79bbc41180ab703", "thumbnail"}},
+					[]model.Photo{{"https://secure.gravatar.com/avatar/cd601941419730dbc79bbc41180ab703", "thumbnail"}},
 					[]string{},
 					"mrisilmi",
 					[]string{},
@@ -49,7 +51,7 @@ func TestGravatar_GetProfile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			g := &Gravatar{
+			g := &AuthorGravatarRepositoryImpl{
 				email:        tt.fields.email,
 				hash:         tt.fields.hash,
 				defaultURL:   tt.fields.defaultURL,
