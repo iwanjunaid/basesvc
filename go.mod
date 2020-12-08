@@ -19,7 +19,7 @@ require (
 	github.com/go-redis/redis/v7 v7.4.0
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/gofiber/adaptor/v2 v2.0.3
+	github.com/gofiber/adaptor/v2 v2.0.3 // indirect
 	github.com/gofiber/fiber/v2 v2.2.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/golang/mock v1.4.4

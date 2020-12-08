@@ -1,56 +1,54 @@
 {
   "rest": {
-    "port": 8080
+    "port": $REST_PORT
   },
   "migration": {
     "postgres": {
-      "dir": "file://db/migrations/postgres",
-      "search_path": "public"
+      "dir": "$MIGRATION_POSTGRES_DIR",
+      "search_path": "$MIGRATION_POSTGRES_SEARCH_PATH"
     }
   },
   "database": {
     "postgres": {
       "write": {
-        "user": "postgres",
-        "pass": "",
-        "host": "127.0.0.1",
-        "port": 5432,
-        "db": "postgres",
+        "user": "$DATABASE_POSTGRES_WRITE_USER",
+        "pass": "$DATABASE_POSTGRES_WRITE_PASS",
+        "host": "$DATABASE_POSTGRES_WRITE_HOST",
+        "port": $DATABASE_POSTGRES_WRITE_PORT,
+        "db": "$DATABASE_POSTGRES_WRITE_DB",
         "ssl": {
-          "mode": "disable"
+          "mode": "$DATABASE_POSTGRES_WRITE_SSL_MODE"
         }
       }
     },
     "mysql": {
-      "write": "user:password@tcp(host:port)/database_name"
+      "write": "$DATABASE_MYSQL_WRITE"
     },
     "redis": {
       "host": {
-        "local": "localhost:6379"
+        "local": "$DATABASE_REDIS_HOST"
       },
-      "password": "",
-      "db": 1
+      "password": "$DATABASE_REDIS_PASSWORD",
+      "db": $DATABASE_REDIS_DB
     },
     "mongo": {
-      "uri": "mongodb://myUserAdmin:abc123@127.0.0.1:27017",
-      "db": "basesvc",
-      "collection": "basesvc"
+      "uri": "$DATABASE_MONGO_URI",
+      "db": "$DATABASE_MONGO_DB",
+      "collection": "$DATABASE_MONGO_COLLECTIONS"
     }
   },
   "kafka": {
-    "host": "localhost:9092",
-    "group_id": "local.group",
-    "security_protocol": "SASL_SSL",
-    "sasl_mechanisms": "PLAIN",
-    "sasl_username": "{{ CLUSTER_API_KEY }}",
-    "sasl_password": "{{ CLUSTER_API_SECRET }}",
-    "topics": [
-      "basesvc"
-    ]
+    "host": "$KAFKA_HOST",
+    "group_id": "$KAFKA_GROUP_ID",
+    "security_protocol": "$KAFKA_SECURITY_PROTOCOL",
+    "sasl_mechanisms": "$KAFKA_SASL_MECHANISMS",
+    "sasl_username": "$KAFKA_SASL_USERNAME",
+    "sasl_password": "$KAFKA_SASL_PASSWORD",
+    "topics": $KAFKA_TOPICS
   },
   "newrelic": {
-    "id": "base-svc",
-    "key": "",
-    "debug": false
+    "id": "$NEWRELIC_ID",
+    "key": "$NEWRELIC_KEY",
+    "debug": $NEWRELIC_DEBUG
   }
 }
