@@ -2,8 +2,10 @@ package interactor
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -58,6 +60,7 @@ func TestGetSQLAuthor(t *testing.T) {
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
 		repoCacheAuthor := repository.NewMockAuthorCacheRepository(ctrl)
+		repoCacheGravatar := repository.NewMockAuthorGravatarCacheRepository(ctrl)
 		presenterAuthor := presenter.NewAuthorPresenter()
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error ", func() {
@@ -78,11 +81,36 @@ func TestGetSQLAuthor(t *testing.T) {
 					CreatedAt: time.Now().Unix(),
 					UpdatedAt: time.Now().Unix(),
 				})
+
+				// entProfiles := &model.GravatarProfiles{
+				// 	Entry: []model.Profile{
+				// {
+				// "103714164",
+				// "cd601941419730dbc79bbc41180ab704",
+				// "cd601941419730dbc79bbc41180ab704",
+				// "http://gravatar.com/anonymous",
+				// "https://secure.gravatar.com/avatar/cd601941419730dbc79bbc41180ab704",
+				// []model.Photo{{"https://secure.gravatar.com/avatar/cd601941419730dbc79bbc41180ab704", "thumbnail"}},
+				// []string{},
+				// "anonymous",
+				// []string{},
+				// },
+				// 	},
+				// }
+
 				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
 				repoCacheAuthor.EXPECT().Create(context.Background(), "all_authors", entAuthor).Return(nil)
+				for _, author := range entAuthor {
+					// Key
+					h := sha256.New()
+					h.Write([]byte(author.Email))
+					key := fmt.Sprintf("%x", h.Sum(nil))
+					repoCacheGravatar.EXPECT().Find(context.Background(), key).Return(nil, errors.New("error"))
+					// repoCacheGravatar.EXPECT().Create(context.Background(), key, entProfiles).Return(nil)
+				}
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
-				uc := NewAuthorInteractor(presenterAuthor, AuthorSQLRepository(repoAuthor), AuthorCacheRepository(repoCacheAuthor))
+				uc := NewAuthorInteractor(presenterAuthor, AuthorSQLRepository(repoAuthor), AuthorCacheRepository(repoCacheAuthor), AuthorGravatarCacheRepository(repoCacheGravatar))
 				res, err := uc.GetAll(context.Background(), "all_authors")
 				So(err, ShouldBeNil)
 				So(res, ShouldNotBeNil)
