@@ -77,26 +77,26 @@ func TestGetSQLAuthor(t *testing.T) {
 				var entAuthor []*model.Author
 				entAuthor = append(entAuthor, &model.Author{
 					Name:      "123",
-					Email:     "123",
+					Email:     "email2@gmail.com",
 					CreatedAt: time.Now().Unix(),
 					UpdatedAt: time.Now().Unix(),
 				})
 
-				// entProfiles := &model.GravatarProfiles{
-				// 	Entry: []model.Profile{
-				// {
-				// "103714164",
-				// "cd601941419730dbc79bbc41180ab704",
-				// "cd601941419730dbc79bbc41180ab704",
-				// "http://gravatar.com/anonymous",
-				// "https://secure.gravatar.com/avatar/cd601941419730dbc79bbc41180ab704",
-				// []model.Photo{{"https://secure.gravatar.com/avatar/cd601941419730dbc79bbc41180ab704", "thumbnail"}},
-				// []string{},
-				// "anonymous",
-				// []string{},
-				// },
-				// 	},
-				// }
+				entProfiles := &model.GravatarProfiles{
+					Entry: []model.Profile{
+						{
+							"120749118",
+							"cb4c9309231b46cca2d6ee14303a7679",
+							"cb4c9309231b46cca2d6ee14303a7679",
+							"http://gravatar.com/yeninesilcik",
+							"https://secure.gravatar.com/avatar/cb4c9309231b46cca2d6ee14303a7679",
+							[]model.Photo{{"https://secure.gravatar.com/avatar/cb4c9309231b46cca2d6ee14303a7679", "thumbnail"}},
+							[]string{},
+							"yeninesilcik",
+							[]string{},
+						},
+					},
+				}
 
 				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
@@ -107,7 +107,7 @@ func TestGetSQLAuthor(t *testing.T) {
 					h.Write([]byte(author.Email))
 					key := fmt.Sprintf("%x", h.Sum(nil))
 					repoCacheGravatar.EXPECT().Find(context.Background(), key).Return(nil, errors.New("error"))
-					// repoCacheGravatar.EXPECT().Create(context.Background(), key, entProfiles).Return(nil)
+					repoCacheGravatar.EXPECT().Create(context.Background(), key, entProfiles).Return(nil)
 				}
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
 				uc := NewAuthorInteractor(presenterAuthor, AuthorSQLRepository(repoAuthor), AuthorCacheRepository(repoCacheAuthor), AuthorGravatarCacheRepository(repoCacheGravatar))
