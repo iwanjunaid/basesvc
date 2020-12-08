@@ -9,6 +9,7 @@ import (
 
 	"github.com/iwanjunaid/basesvc/adapter/presenter"
 	"github.com/iwanjunaid/basesvc/domain/model"
+	interactor "github.com/iwanjunaid/basesvc/shared/mock/interactor"
 	repository "github.com/iwanjunaid/basesvc/shared/mock/repository"
 
 	"github.com/golang/mock/gomock"
@@ -58,7 +59,7 @@ func TestGetSQLAuthor(t *testing.T) {
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
 		repoCacheAuthor := repository.NewMockAuthorCacheRepository(ctrl)
-		// repoCacheGravatar := repository.NewMockAuthorGravatarCacheRepository(ctrl)
+		interactorGravatar := interactor.NewMockGravatarInteractor(ctrl)
 		presenterAuthor := presenter.NewAuthorPresenter()
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error ", func() {
@@ -80,39 +81,18 @@ func TestGetSQLAuthor(t *testing.T) {
 					UpdatedAt: time.Now().Unix(),
 				})
 
-				// entProfiles := &model.GravatarProfiles{
-				// 	Entry: []model.Profile{
-				// 		{
-				// 			"120749118",
-				// 			"cb4c9309231b46cca2d6ee14303a7679",
-				// 			"cb4c9309231b46cca2d6ee14303a7679",
-				// 			"http://gravatar.com/yeninesilcik",
-				// 			"https://secure.gravatar.com/avatar/cb4c9309231b46cca2d6ee14303a7679",
-				// 			[]model.Photo{{"https://secure.gravatar.com/avatar/cb4c9309231b46cca2d6ee14303a7679", "thumbnail"}},
-				// 			[]string{},
-				// 			"yeninesilcik",
-				// 			[]string{},
-				// 		},
-				// 	},
-				// }
-
 				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
 				repoCacheAuthor.EXPECT().Create(context.Background(), "all_authors", entAuthor).Return(nil)
-				// for _, author := range entAuthor {
-				// 	// Key
-				// 	h := sha256.New()
-				// 	h.Write([]byte(author.Email))
-				// 	key := fmt.Sprintf("%x", h.Sum(nil))
-				// 	repoCacheGravatar.EXPECT().Find(context.Background(), key).Return(nil, errors.New("error"))
-				// 	repoCacheGravatar.EXPECT().Create(context.Background(), key, entProfiles).Return(nil)
-				// }
+				for _, author := range entAuthor {
+					interactorGravatar.EXPECT().Get(context.Background(), author.Email)
+				}
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
 				uc := NewAuthorInteractor(
 					presenterAuthor,
 					AuthorSQLRepository(repoAuthor),
 					AuthorCacheRepository(repoCacheAuthor),
-					// AuthorGravatarCacheRepository(repoCacheGravatar)
+					GravatarInteractor(interactorGravatar),
 				)
 				res, err := uc.GetAll(context.Background(), "all_authors")
 				So(err, ShouldBeNil)
