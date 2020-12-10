@@ -7,7 +7,6 @@ import (
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
-	gi "github.com/iwanjunaid/basesvc/usecase/gravatar/interactor"
 )
 
 type AuthorInteractor interface {
@@ -23,7 +22,6 @@ type AuthorInteractorImpl struct {
 	AuthorCacheRepository    repository.AuthorCacheRepository
 	AuthorEventRepository    repository.AuthorEventRepository
 	AuthorPresenter          presenter.AuthorPresenter
-	GravatarInteractor       gi.GravatarInteractor
 }
 
 type Option func(impl *AuthorInteractorImpl)
@@ -62,35 +60,7 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	}
 }
 
-func GravatarInteractor(gvtr gi.GravatarInteractor) Option {
-	return func(impl *AuthorInteractorImpl) {
-		impl.GravatarInteractor = gvtr
-	}
-}
-
-func (ai *AuthorInteractorImpl) setAvatar(ctx context.Context, author *model.Author) (*model.Author, error) {
-	// Set Gravatar Profile
-	var avatar string
-
-	profile, err := ai.GravatarInteractor.Get(ctx, author.Email)
-	if err != nil {
-		return author, err
-	}
-
-	if profile != nil && len(profile.Entry) > 0 {
-		avatar = profile.Entry[0].ThumbnailUrl
-	}
-
-	author.Avatar = avatar
-
-	return author, nil
-}
-
 func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) (author *model.Author, err error) {
-	defer func() {
-		author, _ = ai.setAvatar(ctx, author)
-	}()
-
 	// Get value from redis based on the key
 	author, err = ai.AuthorCacheRepository.Find(ctx, key)
 
@@ -117,12 +87,6 @@ func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) 
 }
 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {
-	defer func() {
-		for _, author := range authors {
-			author, _ = ai.setAvatar(ctx, author)
-		}
-	}()
-
 	// Get value from redis based on the key
 	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)
 
@@ -130,7 +94,7 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors
 		return ai.AuthorPresenter.ResponseUsers(ctx, authors)
 	}
 
-	// If not available then get from sql repo
+	// If not available  then get from sql repo
 	authors, err = ai.AuthorSQLRepository.FindAll(ctx)
 	if err != nil {
 		return nil, err

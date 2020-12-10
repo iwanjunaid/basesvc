@@ -9,7 +9,6 @@ import (
 
 	"github.com/iwanjunaid/basesvc/adapter/presenter"
 	"github.com/iwanjunaid/basesvc/domain/model"
-	interactor "github.com/iwanjunaid/basesvc/shared/mock/interactor"
 	repository "github.com/iwanjunaid/basesvc/shared/mock/repository"
 
 	"github.com/golang/mock/gomock"
@@ -59,7 +58,6 @@ func TestGetSQLAuthor(t *testing.T) {
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
 		repoCacheAuthor := repository.NewMockAuthorCacheRepository(ctrl)
-		interactorGravatar := interactor.NewMockGravatarInteractor(ctrl)
 		presenterAuthor := presenter.NewAuthorPresenter()
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error ", func() {
@@ -84,15 +82,11 @@ func TestGetSQLAuthor(t *testing.T) {
 				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
 				repoCacheAuthor.EXPECT().Create(context.Background(), "all_authors", entAuthor).Return(nil)
-				for _, author := range entAuthor {
-					interactorGravatar.EXPECT().Get(context.Background(), author.Email)
-				}
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
 				uc := NewAuthorInteractor(
 					presenterAuthor,
 					AuthorSQLRepository(repoAuthor),
 					AuthorCacheRepository(repoCacheAuthor),
-					GravatarInteractor(interactorGravatar),
 				)
 				res, err := uc.GetAll(context.Background(), "all_authors")
 				So(err, ShouldBeNil)
