@@ -13,7 +13,10 @@ import (
 )
 
 func (r *registry) NewAuthorController() controller.AuthorController {
-	return controller.NewAuthorController(r.NewAuthorInteractor())
+	return controller.NewAuthorController(
+		r.NewAuthorInteractor(),
+		r.NewGravatarInteractor(),
+	)
 }
 
 func (r *registry) NewAuthorInteractor() interactor.AuthorInteractor {
@@ -21,7 +24,8 @@ func (r *registry) NewAuthorInteractor() interactor.AuthorInteractor {
 		interactor.AuthorSQLRepository(r.NewAuthorSQLRepository()),
 		interactor.AuthorDocumentRepository(r.NewAuthorDocumentRepository()),
 		interactor.AuthorCacheRepository(r.NewAuthorCacheRepository()),
-		interactor.AuthorEventRepository(r.NewEventRepository()))
+		interactor.AuthorEventRepository(r.NewEventRepository()),
+	)
 }
 
 func (r *registry) NewAuthorSQLRepository() repository.AuthorSQLRepository {
