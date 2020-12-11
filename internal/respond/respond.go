@@ -59,15 +59,15 @@ func Fail(c *fiber.Ctx, status, errorCode int, err error) error {
 		err = ec.Cause()
 	}
 
-	// if error masked with xerrs, get detail!
-	txn.NoticeError(xerrs.Cause(err))
-
 	if ev, ok2 := err.(validation.Errors); ok2 {
 		message = "there`s some validation issues in request attributes"
 		reason = ev
 	}
 	c.Set("X-Request-ID", requestID)
 	c.Status(status)
+
+	// if error masked with xerrs, get detail!
+	txn.NoticeError(xerrs.Cause(err))
 	return c.JSON(&Response{
 		RequestId: requestID,
 		Status:    status,

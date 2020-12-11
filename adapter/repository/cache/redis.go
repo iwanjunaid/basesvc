@@ -7,6 +7,7 @@ import (
 	"github.com/go-redis/cache/v7"
 	"github.com/go-redis/redis/v7"
 	"github.com/iwanjunaid/basesvc/domain/model"
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
 	"github.com/vmihailenco/msgpack/v4"
 )
@@ -16,7 +17,15 @@ type AuthorCacheRepositoryImpl struct {
 	cache *cache.Codec
 }
 
+func (ar *AuthorCacheRepositoryImpl) nrredisHook(c context.Context) error {
+	redis := telemetry.StartRedisSegment(c, ar.rdb)
+	ar.rdb = redis
+	ar.cache.Redis = redis
+	return nil
+}
+
 func (ar *AuthorCacheRepositoryImpl) Find(ctx context.Context, key string) (author *model.Author, err error) {
+	ar.nrredisHook(ctx)
 	if err := ar.cache.Get(key, &author); err != nil {
 		return nil, err
 	}
@@ -24,6 +33,7 @@ func (ar *AuthorCacheRepositoryImpl) Find(ctx context.Context, key string) (auth
 }
 
 func (ar *AuthorCacheRepositoryImpl) FindAll(ctx context.Context, key string) (authors []*model.Author, err error) {
+	ar.nrredisHook(ctx)
 	if err := ar.cache.Get(key, &authors); err != nil {
 		return nil, err
 	}
@@ -32,6 +42,7 @@ func (ar *AuthorCacheRepositoryImpl) FindAll(ctx context.Context, key string) (a
 }
 
 func (ar *AuthorCacheRepositoryImpl) Create(ctx context.Context, key string, value interface{}) error {
+	ar.nrredisHook(ctx)
 	if err := ar.cache.Set(&cache.Item{
 		Ctx:    ctx,
 		Key:    key,

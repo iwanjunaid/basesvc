@@ -26,10 +26,3 @@ type AuthorCacheRepository interface {
 type AuthorEventRepository interface {
 	Publish(ctx context.Context, key, message []byte) (err error)
 }
-
-type AuthorGravatarRepository interface {
-	GetProfile() (*model.GravatarProfiles, error)
-	URL() (string, error)
-	JSONURL() (string, error)
-	AvatarURL() (string, error)
-}
