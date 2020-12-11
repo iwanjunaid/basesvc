@@ -17,7 +17,7 @@ type InternalKafka interface {
 	Publish(ctx context.Context, key, message []byte) (err error)
 }
 
-func (author *InternalKafkaImpl) Publish(ctx context.Context, key, message []byte) (err error) {
+func (k *InternalKafkaImpl) Publish(ctx context.Context, key, message []byte) (err error) {
 	var (
 		topics       = config.GetStringSlice("kafka.topics")
 		topic        string
@@ -27,7 +27,7 @@ func (author *InternalKafkaImpl) Publish(ctx context.Context, key, message []byt
 	if len(topics) > 0 {
 		topic = topics[0]
 	}
-	err = author.kp.Produce(&kafka.Message{
+	err = k.kp.Produce(&kafka.Message{
 		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 		Value:          message,
 		Key:            key,
