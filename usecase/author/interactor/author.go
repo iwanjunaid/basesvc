@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/iwanjunaid/basesvc/internal/kafka"
+
+	"github.com/iwanjunaid/basesvc/internal/redis"
+
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
@@ -19,8 +23,8 @@ type AuthorInteractor interface {
 type AuthorInteractorImpl struct {
 	AuthorSQLRepository      repository.AuthorSQLRepository
 	AuthorDocumentRepository repository.AuthorDocumentRepository
-	AuthorCacheRepository    repository.AuthorCacheRepository
-	AuthorEventRepository    repository.AuthorEventRepository
+	AuthorCacheRepository    redis.InternalRedis
+	AuthorEventRepository    kafka.InternalKafka
 	AuthorPresenter          presenter.AuthorPresenter
 }
 
@@ -48,13 +52,13 @@ func AuthorDocumentRepository(document repository.AuthorDocumentRepository) Opti
 	}
 }
 
-func AuthorCacheRepository(cache repository.AuthorCacheRepository) Option {
+func AuthorCacheRepository(cache redis.InternalRedis) Option {
 	return func(impl *AuthorInteractorImpl) {
 		impl.AuthorCacheRepository = cache
 	}
 }
 
-func AuthorEventRepository(event repository.AuthorEventRepository) Option {
+func AuthorEventRepository(event kafka.InternalKafka) Option {
 	return func(impl *AuthorInteractorImpl) {
 		impl.AuthorEventRepository = event
 	}
@@ -62,7 +66,10 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 
 func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) (author *model.Author, err error) {
 	// Get value from redis based on the key
-	author, err = ai.AuthorCacheRepository.Find(ctx, key)
+	err = ai.AuthorCacheRepository.Get(ctx, key, &author)
+	if err != nil {
+		return author, err
+	}
 
 	if author != nil {
 		return ai.AuthorPresenter.ResponseUser(ctx, author)
@@ -88,7 +95,7 @@ func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) 
 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {
 	// Get value from redis based on the key
-	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)
+	err = ai.AuthorCacheRepository.Get(ctx, key, &authors)
 
 	if authors != nil {
 		return ai.AuthorPresenter.ResponseUsers(ctx, authors)

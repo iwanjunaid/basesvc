@@ -15,15 +15,15 @@ type InternalRedisImpl struct {
 }
 
 type InternalRedis interface {
-	Get(ctx context.Context, key string) (resp interface{}, err error)
+	Get(ctx context.Context, key string, obj interface{}) error
 	Create(ctx context.Context, key string, value interface{}) error
 }
 
-func (ar *InternalRedisImpl) Get(ctx context.Context, key string) (resp interface{}, err error) {
-	if err := ar.cache.Get(key, &resp); err != nil {
-		return nil, err
+func (ar *InternalRedisImpl) Get(ctx context.Context, key string, obj interface{}) error {
+	if err := ar.cache.GetContext(ctx, key, obj); err != nil {
+		return err
 	}
-	return resp, nil
+	return nil
 }
 
 func (ar *InternalRedisImpl) Create(ctx context.Context, key string, value interface{}) error {
