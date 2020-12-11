@@ -74,15 +74,20 @@ func TestGetSQLAuthor(t *testing.T) {
 				var entAuthor []*model.Author
 				entAuthor = append(entAuthor, &model.Author{
 					Name:      "123",
-					Email:     "123",
+					Email:     "email2@gmail.com",
 					CreatedAt: time.Now().Unix(),
 					UpdatedAt: time.Now().Unix(),
 				})
+
 				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
 				repoCacheAuthor.EXPECT().Create(context.Background(), "all_authors", entAuthor).Return(nil)
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
-				uc := NewAuthorInteractor(presenterAuthor, AuthorSQLRepository(repoAuthor), AuthorCacheRepository(repoCacheAuthor))
+				uc := NewAuthorInteractor(
+					presenterAuthor,
+					AuthorSQLRepository(repoAuthor),
+					AuthorCacheRepository(repoCacheAuthor),
+				)
 				res, err := uc.GetAll(context.Background(), "all_authors")
 				So(err, ShouldBeNil)
 				So(res, ShouldNotBeNil)

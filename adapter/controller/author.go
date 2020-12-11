@@ -6,7 +6,8 @@ import (
 	"fmt"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
-	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
+	athri "github.com/iwanjunaid/basesvc/usecase/author/interactor"
+	gvtri "github.com/iwanjunaid/basesvc/usecase/gravatar/interactor"
 )
 
 type AuthorController interface {
@@ -17,12 +18,14 @@ type AuthorController interface {
 }
 
 type AuthorControllerImpl struct {
-	AuthorInteractor interactor.AuthorInteractor
+	AuthorInteractor   athri.AuthorInteractor
+	GravatarInteractor gvtri.GravatarInteractor
 }
 
-func NewAuthorController(interactor interactor.AuthorInteractor) AuthorController {
+func NewAuthorController(ai athri.AuthorInteractor, gi gvtri.GravatarInteractor) AuthorController {
 	return &AuthorControllerImpl{
-		AuthorInteractor: interactor,
+		AuthorInteractor:   ai,
+		GravatarInteractor: gi,
 	}
 }
 
@@ -38,6 +41,14 @@ func (a *AuthorControllerImpl) GetAuthors(ctx context.Context) ([]*model.Author,
 	if err != nil {
 		return nil, err
 	}
+
+	for _, author := range authors {
+		author, err = a.setAvatar(ctx, author)
+	}
+	if err != nil {
+		return authors, err
+	}
+
 	return authors, nil
 }
 
@@ -57,6 +68,11 @@ func (a *AuthorControllerImpl) GetAuthor(ctx context.Context, id string) (*model
 	author, err := a.AuthorInteractor.Get(ctx, key, id)
 	if err != nil {
 		return nil, err
+	}
+
+	author, err = a.setAvatar(ctx, author)
+	if err != nil {
+		return author, err
 	}
 	return author, nil
 }
@@ -84,4 +100,22 @@ func (a *AuthorControllerImpl) InsertDocument(ctx context.Context, author *model
 		return err
 	}
 	return nil
+}
+
+func (a *AuthorControllerImpl) setAvatar(ctx context.Context, author *model.Author) (*model.Author, error) {
+	// Set Gravatar Profile
+	var avatar string
+
+	profile, err := a.GravatarInteractor.Get(ctx, author.Email)
+	if err != nil {
+		return author, err
+	}
+
+	if profile != nil && len(profile.Entry) > 0 {
+		avatar = profile.Entry[0].ThumbnailUrl
+	}
+
+	author.Avatar = avatar
+
+	return author, nil
 }

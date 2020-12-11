@@ -9,7 +9,7 @@ import (
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
-	"github.com/iwanjunaid/basesvc/usecase/author/repository"
+	"github.com/iwanjunaid/basesvc/usecase/gravatar/repository"
 	newrelic "github.com/newrelic/go-agent/v3/newrelic"
 
 	"github.com/go-resty/resty/v2"
@@ -18,7 +18,7 @@ import (
 const BASEURL string = "https://www.gravatar.com"
 
 type (
-	AuthorGravatarRepositoryImpl struct {
+	GravatarRepositoryImpl struct {
 		email        string
 		hash         string
 		defaultURL   string
@@ -30,18 +30,18 @@ type (
 	}
 )
 
-func NewAuthorGravatar(ctx context.Context, email string) repository.AuthorGravatarRepository {
+func NewGravatarRepository(ctx context.Context, email string) repository.GravatarRepository {
 	bEmail := []byte(email)
 	hash := md5.Sum(bEmail)
 
-	return &AuthorGravatarRepositoryImpl{
+	return &GravatarRepositoryImpl{
 		hash:    fmt.Sprintf("%x", hash),
 		context: ctx,
 	}
 }
 
 // URL return profile url
-func (g *AuthorGravatarRepositoryImpl) URL() (string, error) {
+func (g *GravatarRepositoryImpl) URL() (string, error) {
 	baseURL, err := url.Parse((BASEURL))
 	if err != nil {
 		return "", err
@@ -51,7 +51,7 @@ func (g *AuthorGravatarRepositoryImpl) URL() (string, error) {
 }
 
 // JSONURL return profile url in json
-func (g *AuthorGravatarRepositoryImpl) JSONURL() (string, error) {
+func (g *GravatarRepositoryImpl) JSONURL() (string, error) {
 	baseURL, err := url.Parse((BASEURL))
 	if err != nil {
 		return "", err
@@ -62,7 +62,7 @@ func (g *AuthorGravatarRepositoryImpl) JSONURL() (string, error) {
 }
 
 // AvatarURL return url of avatar
-func (g *AuthorGravatarRepositoryImpl) AvatarURL() (avatar string, err error) {
+func (g *GravatarRepositoryImpl) AvatarURL() (avatar string, err error) {
 	baseURL, err := url.Parse(BASEURL)
 	if err != nil {
 		return
@@ -102,7 +102,7 @@ func (g *AuthorGravatarRepositoryImpl) AvatarURL() (avatar string, err error) {
 }
 
 // GetProfile return Gravatar profile struct
-func (g *AuthorGravatarRepositoryImpl) GetProfile() (res *model.GravatarProfiles, err error) {
+func (g *GravatarRepositoryImpl) GetProfile() (res *model.GravatarProfiles, err error) {
 	txn := telemetry.GetTelemetry(g.context)
 	defer txn.End()
 

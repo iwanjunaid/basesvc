@@ -3,9 +3,7 @@ package interactor
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
-	"github.com/iwanjunaid/basesvc/adapter/repository/api"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
@@ -23,7 +21,6 @@ type AuthorInteractorImpl struct {
 	AuthorDocumentRepository repository.AuthorDocumentRepository
 	AuthorCacheRepository    repository.AuthorCacheRepository
 	AuthorEventRepository    repository.AuthorEventRepository
-	AuthorGravatarRepository repository.AuthorGravatarRepository
 	AuthorPresenter          presenter.AuthorPresenter
 }
 
@@ -63,30 +60,7 @@ func AuthorEventRepository(event repository.AuthorEventRepository) Option {
 	}
 }
 
-func setAvatar(ctx context.Context, author *model.Author) (*model.Author, error) {
-	// Get Gravatar Profile
-	var avatar string
-	gravatar := api.NewAuthorGravatar(ctx, author.Email)
-	profile, err := gravatar.GetProfile()
-	fmt.Printf("profile : %v \n", profile)
-
-	if len(profile.Entry) > 0 {
-		avatar = profile.Entry[0].ThumbnailUrl
-	}
-
-	if err != nil {
-		return author, err
-	}
-	author.Avatar = avatar
-
-	return author, nil
-}
-
 func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) (author *model.Author, err error) {
-	defer func() {
-		author, _ = setAvatar(ctx, author)
-	}()
-
 	// Get value from redis based on the key
 	author, err = ai.AuthorCacheRepository.Find(ctx, key)
 
@@ -113,12 +87,6 @@ func (ai *AuthorInteractorImpl) Get(ctx context.Context, key string, id string) 
 }
 
 func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors []*model.Author, err error) {
-	defer func() {
-		for _, author := range authors {
-			author, _ = setAvatar(ctx, author)
-		}
-	}()
-
 	// Get value from redis based on the key
 	authors, err = ai.AuthorCacheRepository.FindAll(ctx, key)
 
@@ -126,7 +94,7 @@ func (ai *AuthorInteractorImpl) GetAll(ctx context.Context, key string) (authors
 		return ai.AuthorPresenter.ResponseUsers(ctx, authors)
 	}
 
-	// If not available then get from sql repo
+	// If not available  then get from sql repo
 	authors, err = ai.AuthorSQLRepository.FindAll(ctx)
 	if err != nil {
 		return nil, err
