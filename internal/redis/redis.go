@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/iwanjunaid/basesvc/internal/telemetry"
+
 	"github.com/go-redis/cache/v7"
 	"github.com/go-redis/redis/v7"
 	"github.com/vmihailenco/msgpack"
@@ -19,7 +21,15 @@ type InternalRedis interface {
 	Create(ctx context.Context, key string, value interface{}) error
 }
 
+func (ar *InternalRedisImpl) nrRedisHook(c context.Context) error {
+	redis := telemetry.StartRedisSegment(c, ar.rdb)
+	ar.rdb = redis
+	ar.cache.Redis = redis
+	return nil
+}
+
 func (ar *InternalRedisImpl) Get(ctx context.Context, key string, obj interface{}) error {
+	ar.nrRedisHook(ctx)
 	if err := ar.cache.GetContext(ctx, key, obj); err != nil {
 		return err
 	}
@@ -27,6 +37,7 @@ func (ar *InternalRedisImpl) Get(ctx context.Context, key string, obj interface{
 }
 
 func (ar *InternalRedisImpl) Create(ctx context.Context, key string, value interface{}) error {
+	ar.nrRedisHook(ctx)
 	if err := ar.cache.Set(&cache.Item{
 		Ctx:    ctx,
 		Key:    key,
@@ -51,7 +62,6 @@ func NewInternalRedisImpl(rdb *redis.Ring) InternalRedis {
 			Unmarshal: func(b []byte, v interface{}) error {
 				return msgpack.Unmarshal(b, v)
 			},
-			// LocalCache: cache.NewTinyLFU(1000, time.Minute),
 		},
 	}
 }
