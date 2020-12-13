@@ -42,11 +42,12 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/swaggo/swag v1.6.9
 	github.com/valyala/fasthttp v1.17.0
+	github.com/vmihailenco/msgpack v4.0.4+incompatible
 	github.com/vmihailenco/msgpack/v4 v4.2.0
 	go.mongodb.org/mongo-driver v1.4.3
 	go.starlark.net v0.0.0-20201118183435-e55f603d8c79 // indirect
 	golang.org/x/arch v0.0.0-20201008161808-52c3e6f60cff // indirect
 	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 // indirect
-	gopkg.in/resty.v1 v1.12.0
+	gopkg.in/resty.v1 v1.12.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

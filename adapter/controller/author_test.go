@@ -13,7 +13,9 @@ import (
 
 	"github.com/iwanjunaid/basesvc/adapter/presenter"
 	"github.com/iwanjunaid/basesvc/domain/model"
+	rd "github.com/iwanjunaid/basesvc/shared/mock/intern/redis"
 	"github.com/iwanjunaid/basesvc/shared/mock/repository"
+
 	in "github.com/iwanjunaid/basesvc/usecase/author/interactor"
 	gi "github.com/iwanjunaid/basesvc/usecase/gravatar/interactor"
 	. "github.com/smartystreets/goconvey/convey"
@@ -65,12 +67,13 @@ func TestGetAllAuthorController(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
-		repoCacheAuthor := repository.NewMockAuthorCacheRepository(ctrl)
+		repoCacheAuthor := rd.NewMockInternalRedis(ctrl)
 		repoCacheGravatar := repository.NewMockGravatarCacheRepository(ctrl)
 		presenterAuthor := presenter.NewAuthorPresenter()
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error", func() {
-				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
+				var author []*model.Author
+				repoCacheAuthor.EXPECT().Get(context.Background(), "all_authors", &author).Return(errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(nil, errors.New("error"))
 				auCtrl := in.NewAuthorInteractor(nil, in.AuthorSQLRepository(repoAuthor), in.AuthorCacheRepository(repoCacheAuthor))
 				gvCtrl := gi.NewGravatarInteractor(nil, gi.GravatarCacheRepository(repoCacheGravatar))
@@ -82,7 +85,7 @@ func TestGetAllAuthorController(t *testing.T) {
 		})
 		Convey("Positive Scenarios", func() {
 			Convey("Should return error", func() {
-				var entAuthor []*model.Author
+				var entAuthor, author []*model.Author
 				entAuthor = append(entAuthor, &model.Author{
 					Name:      "123",
 					Email:     "email2@gmail.com",
@@ -110,7 +113,7 @@ func TestGetAllAuthorController(t *testing.T) {
 						},
 					},
 				}
-				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
+				repoCacheAuthor.EXPECT().Get(context.Background(), "all_authors", &author).Return(errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
 				repoCacheAuthor.EXPECT().Create(context.Background(), "all_authors", entAuthor).Return(nil)
 				repoCacheGravatar.EXPECT().Find(context.Background(), "0713fe419c9cdf793cd8c2d6e50ac07c21059d5364535387ae46f4003850294a").Return(nil, errors.New("error"))
