@@ -3,10 +3,10 @@ package registry
 import (
 	"github.com/iwanjunaid/basesvc/adapter/controller"
 	ap "github.com/iwanjunaid/basesvc/adapter/presenter"
-	cr "github.com/iwanjunaid/basesvc/adapter/repository/cache"
 	dr "github.com/iwanjunaid/basesvc/adapter/repository/document"
-	er "github.com/iwanjunaid/basesvc/adapter/repository/event"
 	sr "github.com/iwanjunaid/basesvc/adapter/repository/sql"
+	"github.com/iwanjunaid/basesvc/internal/kafka"
+	rInternal "github.com/iwanjunaid/basesvc/internal/redis"
 	"github.com/iwanjunaid/basesvc/usecase/author/interactor"
 	"github.com/iwanjunaid/basesvc/usecase/author/presenter"
 	"github.com/iwanjunaid/basesvc/usecase/author/repository"
@@ -36,12 +36,12 @@ func (r *registry) NewAuthorDocumentRepository() repository.AuthorDocumentReposi
 	return dr.NewAuthorDocumentRepository(r.mdb)
 }
 
-func (r *registry) NewAuthorCacheRepository() repository.AuthorCacheRepository {
-	return cr.NewAuthorCacheRepository(r.rdb)
+func (r *registry) NewAuthorCacheRepository() rInternal.InternalRedis {
+	return rInternal.NewInternalRedisImpl(r.rdb)
 }
 
-func (r *registry) NewEventRepository() repository.AuthorEventRepository {
-	return er.NewAuthorEventRepository(r.kP)
+func (r *registry) NewEventRepository() kafka.InternalKafka {
+	return kafka.NewInternalKafkaImpl(r.kP)
 }
 
 func (r *registry) NewAuthorPresenter() presenter.AuthorPresenter {

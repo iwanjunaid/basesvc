@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/iwanjunaid/basesvc/shared/mock/intern/redis"
+
 	"github.com/iwanjunaid/basesvc/adapter/presenter"
 	"github.com/iwanjunaid/basesvc/domain/model"
 	repository "github.com/iwanjunaid/basesvc/shared/mock/repository"
@@ -57,11 +59,12 @@ func TestGetSQLAuthor(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		repoAuthor := repository.NewMockAuthorSQLRepository(ctrl)
-		repoCacheAuthor := repository.NewMockAuthorCacheRepository(ctrl)
+		repoCacheAuthor := redis.NewMockInternalRedis(ctrl)
 		presenterAuthor := presenter.NewAuthorPresenter()
 		Convey("Negative Scenarios", func() {
 			Convey("Should return error ", func() {
-				repoCacheAuthor.EXPECT().FindAll(context.Background(), "").Return(nil, errors.New("error"))
+				var entAuthor []*model.Author
+				repoCacheAuthor.EXPECT().Get(context.Background(), "", &entAuthor).Return(errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(nil, errors.New("error"))
 				uc := NewAuthorInteractor(nil, AuthorSQLRepository(repoAuthor), AuthorCacheRepository(repoCacheAuthor))
 				res, err := uc.GetAll(context.Background(), "")
@@ -71,6 +74,8 @@ func TestGetSQLAuthor(t *testing.T) {
 		})
 		Convey("Positive Scenarios", func() {
 			Convey("Get All Author", func() {
+				var author []*model.Author
+				repoCacheAuthor.EXPECT().Get(context.Background(), "all_authors", &author).Return(errors.New("error"))
 				var entAuthor []*model.Author
 				entAuthor = append(entAuthor, &model.Author{
 					Name:      "123",
@@ -78,8 +83,6 @@ func TestGetSQLAuthor(t *testing.T) {
 					CreatedAt: time.Now().Unix(),
 					UpdatedAt: time.Now().Unix(),
 				})
-
-				repoCacheAuthor.EXPECT().FindAll(context.Background(), "all_authors").Return(nil, errors.New("error"))
 				repoAuthor.EXPECT().FindAll(context.Background()).Return(entAuthor, nil)
 				repoCacheAuthor.EXPECT().Create(context.Background(), "all_authors", entAuthor).Return(nil)
 				presenterAuthor.ResponseUsers(context.Background(), entAuthor)
