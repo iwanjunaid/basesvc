@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/go-redis/redis/v7"
@@ -22,23 +23,25 @@ import (
 )
 
 var (
-	CfgMySql           = "database.mysql"
-	CfgRedisHost       = "database.redis.host"
-	CfgRedisPass       = "database.redis.password"
-	CfgRedisDB         = "database.redis.db"
-	CfgKafkaGroup      = "kafka.group_id"
-	CfgKafkaHost       = "kafka.host"
-	CfgKafkaProtocol   = "kafka.security_protocol"
-	CfgKafkaMechanisms = "kafka.sasl_mechanisms"
-	CfgKafkaKey        = "kafka.sasl_username"
-	CfgKafkaSecret     = "kafka.sasl_password"
-	CfgKafkaTopic      = "kafka.topics"
-	CfgNewRelicKey     = "newrelic.key"
-	CfgNewRelicDebug   = "newrelic.debug"
-	CfgMongoURI        = "database.mongo.uri"
-	CfgMongoDB         = "database.mongo.db"
-	CfgSentryKey       = "sentry.key"
-	TelemetryID        = "newrelic.id"
+	CfgMySql                      = "database.mysql"
+	CfgRedisHost                  = "database.redis.host"
+	CfgRedisPass                  = "database.redis.password"
+	CfgRedisDB                    = "database.redis.db"
+	CfgKafkaGroup                 = "kafka.group_id"
+	CfgKafkaHost                  = "kafka.host"
+	CfgKafkaProtocol              = "kafka.security_protocol"
+	CfgKafkaMechanisms            = "kafka.sasl_mechanisms"
+	CfgKafkaKey                   = "kafka.sasl_username"
+	CfgKafkaSecret                = "kafka.sasl_password"
+	CfgKafkaTopic                 = "kafka.topics"
+	CfgNewRelicKey                = "newrelic.key"
+	CfgNewRelicDebug              = "newrelic.debug"
+	CfgMongoURI                   = "database.mongo.uri"
+	CfgMongoDB                    = "database.mongo.db"
+	CfgSentryKey                  = "sentry.key"
+	TelemetryID                   = "newrelic.id"
+	CfgNewrelicSlowQueryThreshold = "newrelic.slowquery.threshold"
+	CfgNewrelicSlowQueryEnabled   = "newrelic.slowquery.enabled"
 )
 
 var (
@@ -110,6 +113,7 @@ func NewTelemetry(l *log.Logger) *newrelic.Application {
 	if isDebug := config.GetBool(CfgNewRelicDebug); isDebug {
 		l.SetLevel(log.DebugLevel)
 	}
+	duration := config.GetFloat64(CfgNewrelicSlowQueryThreshold)
 	app, err := newrelic.NewApplication(
 		newrelic.ConfigAppName(config.GetString(TelemetryID)),
 		newrelic.ConfigLicense(key),
@@ -117,6 +121,8 @@ func NewTelemetry(l *log.Logger) *newrelic.Application {
 		nrlogrus.ConfigLogger(l),
 		func(cfg *newrelic.Config) {
 			cfg.ErrorCollector.RecordPanics = true
+			cfg.DatastoreTracer.SlowQuery.Enabled = config.GetBool(CfgNewrelicSlowQueryEnabled)
+			cfg.DatastoreTracer.SlowQuery.Threshold = time.Duration(duration) * time.Second
 		},
 	)
 	if err != nil {

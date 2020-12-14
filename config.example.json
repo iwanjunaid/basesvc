@@ -51,6 +51,10 @@
   "newrelic": {
     "id": "base-svc",
     "key": "",
-    "debug": false
+    "debug": false,
+    "slowquery": {
+      "enabled": true,
+      "threshold": 10
+    }
   }
 }
