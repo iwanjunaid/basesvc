@@ -50,5 +50,9 @@
     "id": "$NEWRELIC_ID",
     "key": "$NEWRELIC_KEY",
     "debug": $NEWRELIC_DEBUG
+    "slowquery": {
+          "enabled": $NEWRELIC_SLOWQUERY_ENABLED,
+          "threshold": $NEWRELIC_SLOWQUERY_THRESHOLD
+    }
   }
 }
