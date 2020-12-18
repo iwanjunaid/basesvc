@@ -10,15 +10,15 @@ import (
 var mokaboxCommand = &cobra.Command{
 	Use: "mokabox",
 	PreRun: func(cmd *cobra.Command, args []string) {
-		defer logger.WithField("component", "consumer_command").Println("PreRun done")
+		defer logger.WithField("component", "mokabox_command").Println("PreRun done")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		defer logger.WithField("component", "consumer_command").Println("Run done")
+		defer logger.WithField("component", "mokabox_command").Println("Run done")
 		mClient, err := datastore.MongoConnect(config.GetString(CfgMongoURI))
 		if err != nil {
 			panic(err)
 		}
-		mokabox.NewMokaBox(mClient).Listen(config.GetStringSlice("kafka.topics"))
+		mokabox.NewMokaBox(mClient).Run()
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 		defer db.Close()

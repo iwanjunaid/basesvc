@@ -34,7 +34,7 @@ func NewMokaBox(mdb *mongo.Client) *MokaBoxImpl {
 	}
 }
 
-func (c *MokaBoxImpl) Listen(topic []string) {
+func (c *MokaBoxImpl) Run() {
 
 	var httpPort = ":8080"
 
