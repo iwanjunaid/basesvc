@@ -11,8 +11,8 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	mConfig "github.com/iwanjunaid/mokabox/config"
 	events "github.com/iwanjunaid/mokabox/event"
-	event "github.com/iwanjunaid/mokabox/internal/interfaces/event"
 	"github.com/iwanjunaid/mokabox/manager"
+	event "github.com/iwanjunaid/mokabox/pkg/interfaces/event"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -29,10 +29,6 @@ type Event interface {
 }
 
 func NewMokaBox(kc *kafka.Consumer, mdb *mongo.Client) *MokaBoxImpl {
-	//registry := registry.NewRegistry(db, registry.NewMongoConn(
-	//	mdb.Collection(config.GetString("database.mongo.collection"))))
-	//appController := registry.NewAppController()
-
 	return &MokaBoxImpl{
 		kc: kc,
 		mc: mdb,
@@ -40,6 +36,21 @@ func NewMokaBox(kc *kafka.Consumer, mdb *mongo.Client) *MokaBoxImpl {
 }
 
 func (c *MokaBoxImpl) Listen(topic []string) {
+
+	var httpPort = ":8080"
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", heartbeat)
+
+	h := &http.Server{Addr: httpPort, Handler: mux}
+
+	go func() {
+		fmt.Println("Listening on http://0.0.0.0:8080")
+		if err := h.ListenAndServe(); err != nil {
+			panic(err)
+		}
+	}()
+
 	eventHandler := func(e event.Event) {
 		switch event := e.(type) {
 		case events.PickerStarted:
@@ -71,7 +82,8 @@ func (c *MokaBoxImpl) Listen(topic []string) {
 		}
 	}
 
-	outboxConfig := mConfig.NewDefaultCommonOutboxConfig(config.GetString("kafka.group_id"), config.GetString("mongo.db"))
+	outboxConfig := mConfig.NewDefaultCommonOutboxConfig(config.GetString("kafka.group_id"),
+		config.GetString("database.mongo.db"))
 
 	kafkaConfig := mConfig.NewCommonKafkaConfig(&kafka.ConfigMap{
 		"bootstrap.servers": config.GetString("kafka.host"),
@@ -81,6 +93,7 @@ func (c *MokaBoxImpl) Listen(topic []string) {
 	manager, err := manager.New(outboxConfig, kafkaConfig, c.mc)
 
 	if err != nil {
+		fmt.Println("masuk error")
 		log.Fatal(err)
 	}
 

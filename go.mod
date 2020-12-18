@@ -24,7 +24,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/golang/mock v1.4.4
 	github.com/google/go-dap v0.3.0 // indirect
-	github.com/iwanjunaid/mokabox v0.0.0-20201216013551-16e72e762e61
+	github.com/iwanjunaid/mokabox v1.0.0
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/mattn/go-colorable v0.1.8 // indirect
