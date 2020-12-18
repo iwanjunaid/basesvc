@@ -18,7 +18,7 @@ var mokaboxCommand = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		mokabox.NewMokaBox(kc, mClient).Listen(config.GetStringSlice("kafka.topics"))
+		mokabox.NewMokaBox(mClient).Listen(config.GetStringSlice("kafka.topics"))
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 		defer db.Close()

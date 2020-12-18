@@ -28,9 +28,8 @@ type Event interface {
 	GetTimestamp() time.Time
 }
 
-func NewMokaBox(kc *kafka.Consumer, mdb *mongo.Client) *MokaBoxImpl {
+func NewMokaBox(mdb *mongo.Client) *MokaBoxImpl {
 	return &MokaBoxImpl{
-		kc: kc,
 		mc: mdb,
 	}
 }
@@ -93,7 +92,6 @@ func (c *MokaBoxImpl) Listen(topic []string) {
 	manager, err := manager.New(outboxConfig, kafkaConfig, c.mc)
 
 	if err != nil {
-		fmt.Println("masuk error")
 		log.Fatal(err)
 	}
 
