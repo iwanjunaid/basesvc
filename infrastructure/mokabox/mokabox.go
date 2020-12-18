@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/iwanjunaid/basesvc/config"
 
@@ -18,14 +17,7 @@ import (
 )
 
 type MokaBoxImpl struct {
-	kc *kafka.Consumer
 	mc *mongo.Client
-}
-
-type Event interface {
-	fmt.Stringer
-	GetPickerGroupID() string
-	GetTimestamp() time.Time
 }
 
 func NewMokaBox(mdb *mongo.Client) *MokaBoxImpl {
