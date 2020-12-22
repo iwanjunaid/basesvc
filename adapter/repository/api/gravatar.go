@@ -16,7 +16,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const BASEURL string = "https://www.gravatar.co.id"
+const BASEURL string = "https://www.gravatar.com"
 
 type (
 	GravatarRepositoryImpl struct {
