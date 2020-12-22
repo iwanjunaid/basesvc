@@ -16,6 +16,7 @@ func Run() {
 	rootCommand.AddCommand(migratePqCmd)
 	rootCommand.AddCommand(migrateMongoCmd)
 	rootCommand.AddCommand(consumerCommand)
+	rootCommand.AddCommand(mokaboxCommand)
 
 	if err := rootCommand.Execute(); err != nil {
 		logger.Panicf("%v", err)
