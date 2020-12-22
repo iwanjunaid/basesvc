@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/iwanjunaid/basesvc/domain/model"
 	"github.com/iwanjunaid/basesvc/internal/telemetry"
@@ -15,7 +16,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const BASEURL string = "https://www.gravatar.com"
+const BASEURL string = "https://www.gravatar.co.id"
 
 type (
 	GravatarRepositoryImpl struct {
@@ -107,6 +108,20 @@ func (g *GravatarRepositoryImpl) GetProfile() (res *model.GravatarProfiles, err 
 	defer txn.End()
 
 	client := resty.New()
+
+	// Retries are configured per client
+	client.
+		// Set retry count to non zero to enable retries
+		SetRetryCount(7).
+		// You can override initial retry wait time.
+		// Default is 100 milliseconds.
+		SetRetryWaitTime(5 * time.Second).
+		// MaxWaitTime can be overridden as well.
+		// Default is 2 seconds.
+		SetRetryMaxWaitTime(20 * time.Second).
+		// SetRetryAfter sets callback to calculate wait time between retries.
+		// Default (nil) implies exponential backoff with jitter
+		SetRetryAfter(nil)
 
 	// Because Gravatar API use redirect method,
 	// We have to set resty redirect policy.
